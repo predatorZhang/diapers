@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.rey.material.widget.EditText
+        android:id="@+id/old_pas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:et_supportMode="charCounter"
+        android:hint="旧密码"
+        android:textDirection="locale"
+        android:paddingTop="8dp"
+        android:inputType="textPassword"
+        app:v_styleId="@array/edittext"/>
+
+    <com.rey.material.widget.EditText
+        android:id="@+id/new_pas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:et_supportMode="charCounter"
+        android:hint="新密码"
+        android:textDirection="locale"
+        android:paddingTop="8dp"
+        android:inputType="textPassword"
+        app:v_styleId="@array/edittext"/>
+
+    <com.rey.material.widget.EditText
+        android:id="@+id/new_pas_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:et_supportMode="charCounter"
+        android:hint="密码确认"
+        android:textDirection="locale"
+        android:paddingTop="8dp"
+        android:inputType="textPassword"
+        app:v_styleId="@array/edittext"/>
+
+    <com.rey.material.widget.CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示密码"
+        android:gravity="center_vertical"
+        android:paddingLeft="24dp"
+        android:layout_marginTop="8dp"
+        app:v_styleId="@array/checkbox"/>
+
+</LinearLayout>

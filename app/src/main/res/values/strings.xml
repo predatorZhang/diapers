@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">locker</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="arr_locks">
+        <item>家</item>
+        <item>学校</item>
+        <item>实验室</item>
+        <item>公司</item>
+    </string-array>
+    <string name="ble_not_supported">该设备不支持蓝牙4.0</string>
+    <string name="bt_not_supported">不支持蓝牙</string>
+    <string name="bt_on">蓝牙设备已开启</string>
+    <string name="bt_not_on">蓝牙开启失败</string>
+
+    <string-array name="device_filter"><item>SensorTag</item></string-array>
+
+</resources>
