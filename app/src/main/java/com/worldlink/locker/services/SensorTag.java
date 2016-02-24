@@ -1,5 +1,5 @@
 /**************************************************************************************************
-  包含Ti7类传感器的service UUID ,charateristics的UUID，以及descriptor的UUID等
+  service UUID ,charateristicsdescriptor
 
  **************************************************************************************************/
 package com.worldlink.locker.services;

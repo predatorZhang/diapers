@@ -9,9 +9,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.worldlink.locker.activity.MainActivity_"
-    android:background="@drawable/bg_home">
-
-    <RelativeLayout
+    android:background="@color/black">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_app_1"
+        android:scaleType="centerCrop"/>
+    <!--RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -28,8 +32,8 @@
             style="@style/Material.Widget.Spinner"
             app:rd_style="@style/Material.Drawable.Ripple.Wave"/>
 
-    </RelativeLayout>
-    <com.rey.material.widget.ImageButton
+    </RelativeLayout>-->
+    <!--com.rey.material.widget.ImageButton
         android:id="@+id/ib_temp"
         style="@style/Material.Drawable.Ripple.Touch.MatchView"
         android:layout_width="wrap_content"
@@ -38,20 +42,97 @@
         android:src="@drawable/temperature"
         android:background="@android:color/transparent"
         app:rd_style="@style/Material.Drawable.Ripple.Touch.MatchView"
+        />-->
+
+    <ImageButton
+        android:id="@+id/ib_device"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:src="@drawable/icon_diaper_alert"
+        android:background="@color/transparent"
+        android:scaleType="centerInside"/>
+    <ImageButton
+        android:id="@+id/ib_setting"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:onClick="onAnimationStyle"
+        android:src="@drawable/icon_settings"
+        android:background="@color/transparent"/>
+    <org.demo.ballprogress.view.SinkView
+        android:id="@+id/sv_progress"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_centerInParent="true"
         />
-    <ImageButton android:id="@+id/ib_info"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sv_progress"
+        android:layout_marginTop="50dp"
+
+        >
+        <ImageButton
+            android:id="@+id/ib_ring"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:layout_centerHorizontal="true"
+            android:padding="20dp"
+            android:src="@drawable/icon_ring"
+            android:background="@color/transparent"
+            android:scaleType="fitXY"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:text="21.6°C"
+            android:layout_toLeftOf="@id/ib_ring"
+            android:layout_centerVertical="true"
+        />
+        <TextView
+            android:id="@+id/tv_feel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:text="--"
+            android:layout_toRightOf="@id/ib_ring"
+            android:layout_centerVertical="true"
+            />
+
+    </RelativeLayout>
+    <ImageButton
+        android:id="@+id/iv_emotion"
+        android:src="@drawable/icon_cry_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:scaleType="centerInside"
+        android:background="#AAC0C0C0"
+        android:visibility="invisible"/>
+
+    <!--ImageButton android:id="@+id/ib_info"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@drawable/info"
         android:background="@android:color/transparent"
         android:stateListAnimator="@anim/fab_anim"
         android:elevation="5dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:scaleType="fitCenter"/>
-    <ImageButton android:id="@+id/ib_setting"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:scaleType="fitCenter"/>-->
+    <!--ImageButton android:id="@+id/ib_setting"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@drawable/share"
         android:background="@android:color/transparent"
         android:stateListAnimator="@anim/fab_anim"
@@ -59,12 +140,12 @@
         android:layout_marginRight="20dp"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/ib_info"
-        android:scaleType="fitCenter"/>
-    <com.rey.material.widget.SnackBar
+        android:scaleType="fitCenter"/>-->
+    <!--com.rey.material.widget.SnackBar
         android:id="@+id/info_sn"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:visibility="invisible"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"/>-->
 
 </RelativeLayout>

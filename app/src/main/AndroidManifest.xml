@@ -27,20 +27,21 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AppTheme"
         android:supportsRtl="true"
-        android:name="com.worldlink.locker.LockerApplication">>
+        android:name="com.worldlink.locker.LockerApplication">
 
         <activity
-            android:name="com.worldlink.locker.activity.MainActivity_"
-            android:label="@string/app_name" >
-        </activity>
-
-        <activity
-            android:name="com.worldlink.locker.activity.SplashActivity_"
+            android:name="com.worldlink.locker.activity.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.worldlink.locker.activity.SplashActivity"
+            android:label="@string/app_name" >
+
         </activity>
 
         <service

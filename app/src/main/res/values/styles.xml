@@ -1,5 +1,10 @@
 <resources>
-    
+
+    <style name="Animation.CustomPopup" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/popup_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
+    </style>
+
     <style name="MenuItemRippleStyle" parent="Material.Drawable.Ripple.Wave">
         <item name="rd_rippleColor">#902DA0FF</item>
         <item name="rd_rippleAnimDuration">300</item>

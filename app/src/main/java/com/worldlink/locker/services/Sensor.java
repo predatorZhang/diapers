@@ -17,7 +17,7 @@
   perform, display or sell this Software and/or its documentation for any purpose.
  
   YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
-  PROVIDED 揂S IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+  PROVIDED AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
   INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
   NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
   TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -51,7 +51,7 @@ import static java.lang.Math.pow;
  */
 
 /*
-     UUID servUuid = Sensor.BAROMETER.getService();UUID_IRT_SERV 对应的是service UUID_IRT_CONF对应的是charateristics，data也是一个单独的charateristic
+     UUID servUuid = Sensor.BAROMETER.getService();UUID_IRT_SERV service UUID_IRT_CONF锟斤拷应锟斤拷锟斤拷charateristics锟斤拷data也锟斤拷一锟斤拷锟斤拷锟斤拷锟斤拷charateristic
 	 UUID configUuid = Sensor.BAROMETER.getConfig();
  */
 public enum Sensor {

@@ -15,7 +15,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,33 +47,43 @@ import com.worldlink.locker.services.BluetoothLeService;
 import com.worldlink.locker.services.Sensor;
 import com.worldlink.locker.services.SensorTag;
 
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Fullscreen;
-import org.androidannotations.annotations.NoTitle;
-import org.androidannotations.annotations.ViewById;
+import org.demo.ballprogress.view.SinkView;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@NoTitle
-@Fullscreen
-@EActivity(R.layout.activity_main)
+import cn.qqtheme.framework.picker.NumberPicker;
+import cn.qqtheme.framework.picker.OptionPicker;
+
+//@NoTitle
+//@Fullscreen
+//@EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
 
-    @ViewById
-    ImageButton ib_temp;
+//    @ViewById
+      ImageButton ib_temp;
+//
+//    @ViewById
+      Spinner spinner_label;
+//
+//    @ViewById
+      SnackBar info_sn;
 
-    @ViewById
-    Spinner spinner_label;
-
-    @ViewById
-    SnackBar info_sn;
-
+    //added by Stevens
+    private SinkView sv_progress;
+    private ImageButton ib_device;
+    private ImageView iv_emotion;
+    private ImageButton ib_settings;
+    private ImageButton ib_ring;
+    private TextView tv_feel;
+    private MediaPlayer myMediaPlayer;
+    private Vibrator vibrator;
+    private boolean isRingOn = true;
+    private boolean isConnected = false;
     private boolean unpressed = true;
 
     private static final String TAG = "MainActivity";
@@ -142,7 +160,7 @@ public class MainActivity extends BaseActivity {
         TextView address;
     }
 
-    @AfterViews
+//    @AfterViews
     public void init() {
 
 
@@ -247,7 +265,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Click
+//    @Click
     public void ib_temp(){
 
         // TODO LIST：点击的时候调用对应的蓝牙功能
@@ -259,21 +277,21 @@ public class MainActivity extends BaseActivity {
             ib_temp.setImageResource(R.drawable.lock2);
         }*/
     }
+//
+//    @Click
+//    public void ib_info(){
+//        //todo list:弹出对应的关于信息
+//        if(info_sn.getState() == SnackBar.STATE_SHOWN)
+//            info_sn.dismiss();
+//        else{
+//            info_sn.applyStyle(R.style.SnackBarMultiLine);
+//            info_sn.text("更多信息，请访问\nwww.hainiutech.com")
+//                    .actionText("CLOSE");
+//            info_sn.show();
+//        }
+//    }
 
-    @Click
-    public void ib_info(){
-        //todo list:弹出对应的关于信息
-        if(info_sn.getState() == SnackBar.STATE_SHOWN)
-            info_sn.dismiss();
-        else{
-            info_sn.applyStyle(R.style.SnackBarMultiLine);
-            info_sn.text("更多信息，请访问\nwww.hainiutech.com")
-                    .actionText("CLOSE");
-            info_sn.show();
-        }
-    }
-
-    @Click
+//    @Click
     public void ib_setting(){
         Dialog.Builder builder = null;
         builder = new SimpleDialog.Builder(true ? R.style.SimpleDialogLight : R.style.SimpleDialog){
@@ -310,6 +328,65 @@ public class MainActivity extends BaseActivity {
 
         DialogFragment fragment = DialogFragment.newInstance(builder);
         fragment.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+        //link widgets
+        sv_progress = (SinkView) findViewById(R.id.sv_progress);
+        ib_device = (ImageButton) findViewById(R.id.ib_device);
+        ib_device.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isConnected){
+                    ib_device.setImageResource(R.drawable.icon_diaper_alert);
+                    Toast.makeText(MainActivity.this, "Device disconnected.", Toast.LENGTH_SHORT).show();
+                    isConnected = false;
+                }else{
+                    isConnected = true;
+                    //for demo purpose only
+                    new ConnectDemoTask().execute();
+                }
+            }
+        });
+        iv_emotion = (ImageView) findViewById(R.id.iv_emotion);
+        iv_emotion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_emotion.setVisibility(View.INVISIBLE);
+                if(isRingOn){
+                    if(myMediaPlayer != null && myMediaPlayer.isPlaying()){
+                        myMediaPlayer.stop();
+                        myMediaPlayer.release();
+                        myMediaPlayer = null;
+                    }
+                }else{
+                    if( vibrator != null){
+                        vibrator.cancel();
+                        vibrator = null;
+                    }
+                }
+
+            }
+        });
+        ib_settings = (ImageButton) findViewById(R.id.ib_setting);
+        ib_ring = (ImageButton) findViewById(R.id.ib_ring);
+        ib_ring.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isRingOn = !isRingOn;
+                if(isRingOn){
+                    ib_ring.setImageResource(R.drawable.icon_ring);
+                }else{
+                    ib_ring.setImageResource(R.drawable.icon_vibrate);
+                }
+            }
+        });
+        tv_feel = (TextView) findViewById(R.id.tv_feel);
+
     }
 
     @Override
@@ -361,6 +438,11 @@ public class MainActivity extends BaseActivity {
         Log.d(TAG, "Destroy");
         super.onDestroy();
 
+        if(myMediaPlayer != null && myMediaPlayer.isPlaying()){
+            myMediaPlayer.stop();
+            myMediaPlayer.release();
+            myMediaPlayer = null;
+        }
         //注销数据监听listenner
         if (mIsReceiving) {
             unregisterReceiver(mGattUpdateReceiver);
@@ -824,4 +906,137 @@ public class MainActivity extends BaseActivity {
         }
         return false;
     }
-}
+
+    /**
+     * Added by Stevens
+     *
+     * popup number picker
+     */
+    public void onAnimationStyle(View view) {
+        NumberPicker picker = new NumberPicker(this);
+        picker.setAnimationStyle(R.style.Animation_CustomPopup);
+        picker.setOffset(1);//偏移量
+        picker.setRange(10, 60);//数字范围
+        picker.setSelectedItem(10);
+        picker.setLabel("秒");
+        picker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
+            @Override
+            public void onOptionPicked(String option) {
+                Toast.makeText(MainActivity.this, "Time interval is " + option, Toast.LENGTH_SHORT).show();
+            }
+        });
+        picker.show();
+    }
+
+    /***
+     * added by Stevens
+     *
+     * used for demo purose only
+     */
+    private class ProgressDemoTask extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (int i = 0; i <= 100; i++) {
+                publishProgress(Integer.valueOf(i));
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            int progress = values[0];
+            sv_progress.setPercent(progress / (float) 100);
+            if( progress <= 20 ){
+                tv_feel.setText("干爽");
+            }
+            else if(progress > 20 && progress <= 60){
+                tv_feel.setText("舒适");
+            }else if(progress > 60 && progress <= 100) {
+                tv_feel.setText("潮湿");
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            iv_emotion.setVisibility(View.VISIBLE);
+            myMediaPlayer = new MediaPlayer();//MediaPlayer.create(this, R.raw.ptt_not);
+            try {
+//				AssetFileDescriptor fd = getResources().openRawResourceFd(R.raw.ptt_not);
+                AssetFileDescriptor fd = getResources().openRawResourceFd(R.raw.beep);
+                long offset = fd.getStartOffset();
+                long length = fd.getLength();
+                if(isRingOn){
+                    myMediaPlayer.setLooping(true);
+                    myMediaPlayer.setDataSource(fd.getFileDescriptor(), offset, length);
+                    myMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    myMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            mp.start();
+                        }
+                    });
+                    myMediaPlayer.prepareAsync();
+                }else{
+                    vibrator  = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+                    vibrator.vibrate(new long[]{200, 100, 200,100, 200,100}, 0);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }//end of ProgressDemoTask
+
+        /***
+         * added by Stevens
+         * used for demo purpose only
+         */
+        private class ConnectDemoTask extends AsyncTask<Void, Integer, Void>{
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                for(int i=0; i<10; i++){
+                    publishProgress(Integer.valueOf(i));
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                int signal = values[0];
+                if(signal%2 == 0){
+                    ib_device.setImageResource(R.drawable.icon_diaper_light);
+
+                }else{
+                    ib_device.setImageResource(R.drawable.icon_diaper_dark);
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                ib_device.setImageResource(R.drawable.icon_diaper_light);
+                Toast.makeText(MainActivity.this, "Device Connected.", Toast.LENGTH_SHORT).show();
+                new ProgressDemoTask().execute();
+            }
+        }//end of ConnectDemoTask
+
+}//end of file
