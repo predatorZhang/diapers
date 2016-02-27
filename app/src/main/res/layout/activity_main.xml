@@ -15,34 +15,6 @@
         android:layout_height="match_parent"
         android:src="@drawable/bg_app_1"
         android:scaleType="centerCrop"/>
-    <!--RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        >
-        <com.rey.material.widget.Spinner
-            android:id="@+id/spinner_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="128dp"
-            android:padding="8dp"
-            android:gravity="center|center"
-            android:layout_centerHorizontal="true"
-            style="@style/Material.Widget.Spinner"
-            app:rd_style="@style/Material.Drawable.Ripple.Wave"/>
-
-    </RelativeLayout>-->
-    <!--com.rey.material.widget.ImageButton
-        android:id="@+id/ib_temp"
-        style="@style/Material.Drawable.Ripple.Touch.MatchView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:src="@drawable/temperature"
-        android:background="@android:color/transparent"
-        app:rd_style="@style/Material.Drawable.Ripple.Touch.MatchView"
-        />-->
 
     <ImageButton
         android:id="@+id/ib_device"
@@ -90,6 +62,7 @@
             android:scaleType="fitXY"
             />
         <TextView
+            android:id="@+id/tv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
