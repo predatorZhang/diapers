@@ -19,7 +19,9 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.Menu;
@@ -85,7 +87,7 @@ public class MainActivity extends BaseActivity {
 
     //蓝牙相关操作
     private BluetoothLeService mBluetoothLeService = null;
-    private boolean mScanning = false;
+    private volatile boolean mScanning = false;
     private BluetoothAdapter mBtAdapter = null;
     private boolean mInitialised = false;
     private IntentFilter mFilter;
@@ -104,6 +106,7 @@ public class MainActivity extends BaseActivity {
     private List<Sensor> mEnabledSensors = new ArrayList<Sensor>();
 
     private List<BleDeviceInfo> devices=new ArrayList<BleDeviceInfo>();
+    private Thread heartBeatThread = new Thread(new SendHeartBeat());
 
 
     @AfterViews
@@ -183,14 +186,14 @@ public class MainActivity extends BaseActivity {
     /**
      * scane the device
      */
-   @Click
+    @Click
     public void ib_device(){
 
-       if (mScanning) {
-           stopScan();
-       } else {
-           startScan();
-       }
+        if (mScanning) {
+            stopScan();
+        } else {
+            startScan();
+        }
 
     }
 
@@ -271,17 +274,26 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onDestroy() {
         Log.d(TAG, "Destroy");
-        super.onDestroy();
 
         if(myMediaPlayer != null && myMediaPlayer.isPlaying()){
             myMediaPlayer.stop();
             myMediaPlayer.release();
             myMediaPlayer = null;
         }
+
+        if (heartBeatThread.isAlive()) {
+            heartBeatThread.interrupt();
+        }
+
         //注销数据监听listenner
         if (mIsReceiving) {
             unregisterReceiver(mGattUpdateReceiver);
             mIsReceiving = false;
+        }
+
+        if (mBluetoothDevice!=null && mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT) ==
+                BluetoothGatt.STATE_CONNECTED) {
+            mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
         }
 
         //注销蓝牙服务
@@ -292,6 +304,9 @@ public class MainActivity extends BaseActivity {
             unbindService(mServiceConnection);
             mBluetoothLeService = null;
         }
+
+        super.onDestroy();
+
     }
 
     /**
@@ -355,9 +370,11 @@ public class MainActivity extends BaseActivity {
                 case BluetoothGatt.STATE_DISCONNECTED:
                     boolean ok = mBluetoothLeService.connect(mBluetoothDevice.getAddress());
                     if (!ok) {
+                        Toast.makeText(MainActivity.this, "蓝牙连接失败", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 default:
+                    Toast.makeText(MainActivity.this, "设备繁忙", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -413,12 +430,14 @@ public class MainActivity extends BaseActivity {
                     }
                     if (mScanning)
                         stopScan();
+
                     mBluetoothDevice = ((BleDeviceInfo)bleDeviceManager.getDevices().get(0)).getBluetoothDevice();
                     if (bleDeviceManager.getmConnIndex() == BleDeviceManager.NO_DEVICE) {
                         bleDeviceManager.setmConnIndex(0);
                         //TODO LIST:避免重复连接同一个设备
                         if(mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT)==
                                 BluetoothGatt.STATE_DISCONNECTED){
+                            //mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
                             onConnect();
                         }
                     }
@@ -469,6 +488,7 @@ public class MainActivity extends BaseActivity {
                 int status = intent.getIntExtra(BluetoothLeService.EXTRA_STATUS, BluetoothGatt.GATT_FAILURE);
                 if (status == BluetoothGatt.GATT_SUCCESS)
                 {
+                    isConnected = true;
                     // Create GATT object
                     mBtGatt = BluetoothLeService.getBtGatt();
 
@@ -509,6 +529,7 @@ public class MainActivity extends BaseActivity {
 
                 if (status == BluetoothGatt.GATT_SUCCESS)
                 {
+                    isConnected = false;
 //					setBusy(false);
 //					mScanView.setStatus(mBluetoothDevice.getName() + " disconnected", STATUS_DURATION);
                 } else
@@ -517,6 +538,9 @@ public class MainActivity extends BaseActivity {
                 }
                 bleDeviceManager.setmConnIndex(BleDeviceManager.NO_DEVICE);
                 mBluetoothLeService.close();
+                ib_device.setImageResource(R.drawable.icon_diaper_alert);
+                startScan();
+
             } else {
                 Log.w(TAG,"Unknown action: " + action);
             }
@@ -552,9 +576,19 @@ public class MainActivity extends BaseActivity {
         // Characteristics descriptor readout done
         if (mServicesRdy) {
             //TODO LIST：初始化后，扫描到服务
-			//enableSensors(true);
-			//enableNotifications(true);
-           enableNotificationForLock(true);
+            //enableSensors(true);
+            // enableNotifications(true);
+
+           /* if (sendHeartBeatTask.getStatus() != AsyncTask.Status.RUNNING) {
+                sendHeartBeatTask.execute();
+            }*/
+            //   sendMsg("on");
+            if (!heartBeatThread.isAlive()) {
+                heartBeatThread.start();
+            }
+            enableNotificationForLock(true);
+            ib_device.setImageResource(R.drawable.icon_diaper_light);
+
         }
         else {
 /*
@@ -587,7 +621,7 @@ public class MainActivity extends BaseActivity {
 
             // Barometer calibration
             if (confUuid.equals(SensorTag.UUID_BAR_CONF) && enable) {
-              //  calibrateBarometer();
+                //  calibrateBarometer();
             }
 
             BluetoothGattService serv = mBtGatt.getService(servUuid);
@@ -617,7 +651,7 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
-        mBtGatt.setCharacteristicNotification(TxChar,true);
+        mBtGatt.setCharacteristicNotification(TxChar, true);
 
         UUID CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
         BluetoothGattDescriptor descriptor = TxChar.getDescriptor(CCCD);
@@ -625,7 +659,7 @@ public class MainActivity extends BaseActivity {
             return;
         }
         descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        mBtGatt.writeDescriptor(descriptor);
+        boolean zhangfan = mBtGatt.writeDescriptor(descriptor);
 
     }
 
@@ -858,28 +892,28 @@ public class MainActivity extends BaseActivity {
         }
     }//end of ProgressDemoTask
 
-        /***
-         * added by Stevens
-         * used for demo purpose only
-         */
-        private class ConnectDemoTask extends AsyncTask<Void, Integer, Void>{
+    /***
+     * added by Stevens
+     * used for demo purpose only
+     */
+    private class ConnectDemoTask extends AsyncTask<Void, Integer, Void>{
 
-            private boolean flag = true;
-            @Override
-            protected Void doInBackground(Void... params) {
+        private volatile boolean  flag = true;
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while (mScanning) {
+                publishProgress(0);
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                while (mScanning) {
-                    publishProgress(0);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+            }
               /*  for(int i=0; i<10; i++){
                     publishProgress(Integer.valueOf(i));
                     try {
@@ -888,37 +922,120 @@ public class MainActivity extends BaseActivity {
                         e.printStackTrace();
                     }
                 }*/
-                return null;
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            flag = !flag;
+            int imgId = flag ? R.drawable.icon_diaper_dark : R.drawable.icon_diaper_light;
+            ib_device.setImageResource(imgId);
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (mBluetoothLeService == null) {
+                ib_device.setImageResource(R.drawable.icon_diaper_alert);
+                Toast.makeText(MainActivity.this, "设备连接失败", Toast.LENGTH_SHORT).show();
             }
 
-            @Override
-            protected void onProgressUpdate(Integer... values) {
-                super.onProgressUpdate(values);
-                flag = !flag;
-                int imgId = flag ? R.drawable.icon_diaper_light : R.drawable.icon_diaper_dark;
-                ib_device.setImageResource(imgId);
-
+            if (isConnected) {
+                ib_device.setImageResource(R.drawable.icon_diaper_light);
+            }
+            else{
+                ib_device.setImageResource(R.drawable.icon_diaper_alert);
             }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-
-                if (mBluetoothLeService == null) {
-                    ib_device.setImageResource(R.drawable.icon_diaper_alert);
-                    Toast.makeText(MainActivity.this, "设备连接失败", Toast.LENGTH_SHORT).show();
-                }
-
-                if (mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT) ==
+             /*   if (mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT) ==
                         BluetoothGatt.STATE_CONNECTED) {
                     ib_device.setImageResource(R.drawable.icon_diaper_light);
                 }
                 else{
                     ib_device.setImageResource(R.drawable.icon_diaper_alert);
-                }
+                }*/
 
+        }
+    }//end of ConnectDemoTask
+
+    /***
+     * added by predator
+     * used for demo purpose only
+     */
+/*
+    private class SendHeartBeatTask extends AsyncTask<Void, Integer, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        }//end of ConnectDemoTask
+            while (isConnected) {
+                try {
+                    Log.i(TAG, "发送心跳");
+                    sendMsg("on");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            int a= 2;
+
+        }
+    }//end of ConnectDemoTask
+*/
+
+
+    // handler类接收数据
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+                // tvShow.setText(Integer.toString(i++));
+                sendMsg("on");
+                Log.i(TAG,"发送心跳");
+            }
+        };
+    };
+
+    // 线程类
+    class SendHeartBeat implements Runnable {
+
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(1000);
+                    Message msg = new Message();
+                    msg.what = 1;
+                    handler.sendMessage(msg);
+                    System.out.println("send...");
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    System.out.println("thread error...");
+                }
+            }
+        }
+    }
 
 }//end of file
