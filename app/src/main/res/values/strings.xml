@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">locker</string>
+    <string name="app_name">IDiapers</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -16,5 +16,9 @@
     <string name="bt_not_on">蓝牙开启失败</string>
 
     <string-array name="device_filter"><item>BLE_REMOTE</item></string-array>
+<!--
+    <string-array name="device_filter"><item>SensorTag</item></string-array>
+-->
+
 
 </resources>

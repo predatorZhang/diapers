@@ -33,6 +33,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.worldlink.locker.R;
+import com.worldlink.locker.common.AlarmDetail;
+import com.worldlink.locker.common.AlarmDetailManager;
 import com.worldlink.locker.services.BleDeviceInfo;
 import com.worldlink.locker.services.BleDeviceManager;
 import com.worldlink.locker.services.BluetoothLeService;
@@ -81,7 +83,6 @@ public class MainActivity extends BaseActivity {
     private Vibrator vibrator;
     private boolean isRingOn = true;
     private boolean isConnected = false;
-    private boolean unpressed = true;
 
     private static final String TAG = "MainActivity";
 
@@ -102,12 +103,13 @@ public class MainActivity extends BaseActivity {
     private boolean mIsReceiving = false;
     private boolean mServicesRdy = false;
     private List<BluetoothGattService> mServiceList = new ArrayList<BluetoothGattService>();
-    private static final int GATT_TIMEOUT = 100; // milliseconds
     private List<Sensor> mEnabledSensors = new ArrayList<Sensor>();
 
     private List<BleDeviceInfo> devices=new ArrayList<BleDeviceInfo>();
     private Thread heartBeatThread = new Thread(new SendHeartBeat());
 
+    private float  alarmTemp;
+    private float  alarmHumity;
 
     @AfterViews
     public void init() {
@@ -146,20 +148,18 @@ public class MainActivity extends BaseActivity {
             }
             mInitialised = true;
         } else {
-
             ib_device.setImageResource(R.drawable.icon_diaper_alert);
         }
 
+        AlarmDetail alarmDetail = AlarmDetailManager.loadAlarmDetail(MainActivity.this);
+        if (alarmDetail != null) {
+            alarmHumity = alarmDetail.getAlarmHum();
+            alarmTemp = alarmDetail.getAlarmTemp();
+        }
+        Log.i(TAG, "UI Thread:"+Thread.currentThread().getId()+"");
 
     }
 
-    private void updateMaterialView() {
-       /* devices = bleDeviceManager.getDevices();
-        if (devices.size() != 0) {
-            spinner_label.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }*/
-    }
 
     // Activity result handling
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -389,15 +389,14 @@ public class MainActivity extends BaseActivity {
         if (mBleSupported) {
             bleDeviceManager.clear();
             scanLeDevice(true);
-            //TODO LIST:更新视图状态
+            //TODO LIST:修改连接的状态
             new ConnectDemoTask().execute();
             if (!mScanning) {
-
+                Log.e(TAG, "bluetooth device scanning falied");
             }
         } else {
             Toast.makeText(MainActivity.this, "BLE not supported on this device", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void stopScan() {
@@ -405,8 +404,17 @@ public class MainActivity extends BaseActivity {
         scanLeDevice(false);
     }
 
+    private Handler mScanHandler = new Handler();
+    private int SCAN_PERIOD = 20000;
     private boolean scanLeDevice(boolean enable) {
         if (enable) {
+            mScanHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScanning = false;
+                    mBtAdapter.stopLeScan(mLeScanCallback);
+                }
+            }, SCAN_PERIOD);
             mScanning = mBtAdapter.startLeScan(mLeScanCallback);
         } else {
             mScanning = false;
@@ -428,6 +436,8 @@ public class MainActivity extends BaseActivity {
                     if (bleDeviceManager.getDevices().size() == 0) {
                         return;
                     }
+                    Log.i(TAG, "onLeScan"+Thread.currentThread().getId());
+
                     if (mScanning)
                         stopScan();
 
@@ -437,16 +447,9 @@ public class MainActivity extends BaseActivity {
                         //TODO LIST:避免重复连接同一个设备
                         if(mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT)==
                                 BluetoothGatt.STATE_DISCONNECTED){
-                            //mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
                             onConnect();
                         }
                     }
-                   /* else {
-                        if (bleDeviceManager.getmConnIndex()  != BleDeviceManager.NO_DEVICE) {
-                            mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
-                        }
-                    }
-*/
                 }
 
             });
@@ -505,18 +508,9 @@ public class MainActivity extends BaseActivity {
                         else
                             displayServices();
                     }
-
-
-					/*setBusy(false);
-					startDeviceActivity();*/
-
-                    // Intent mDeviceIntent = new Intent(DeviceListActivity.this, MainActivity_.class);
-                    //  mDeviceIntent.putExtra(MainActivity_.EXTRA_DEVICE, mBluetoothDevice);
-                    //  startActivityForResult(mDeviceIntent, REQ_DEVICE_ACT);
                 }
-                else
-                {
-//					setError("Connect failed. Status: " + status);
+                else {
+                    Log.e(TAG, "connection failed" + status);
                 }
             }
             else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action))
@@ -524,22 +518,19 @@ public class MainActivity extends BaseActivity {
                 // GATT disconnect
                 int status = intent.getIntExtra(BluetoothLeService.EXTRA_STATUS, BluetoothGatt.GATT_FAILURE);
 
-                //TODO LIST：删除那个activity
-                //stopDeviceActivity();
-
                 if (status == BluetoothGatt.GATT_SUCCESS)
                 {
                     isConnected = false;
-//					setBusy(false);
-//					mScanView.setStatus(mBluetoothDevice.getName() + " disconnected", STATUS_DURATION);
-                } else
-                {
-//					setError("Disconnect failed. Status: " + status);
+                    Log.i(TAG, "Disconnect device:" + mBluetoothDevice.getName());
+
+                } else {
+                    Log.e(TAG, "Disconnect failed. Status: " + status);
                 }
                 bleDeviceManager.setmConnIndex(BleDeviceManager.NO_DEVICE);
                 mBluetoothLeService.close();
                 ib_device.setImageResource(R.drawable.icon_diaper_alert);
-                startScan();
+
+                startScan();//重新扫描设备
 
             } else {
                 Log.w(TAG,"Unknown action: " + action);
@@ -575,66 +566,18 @@ public class MainActivity extends BaseActivity {
 
         // Characteristics descriptor readout done
         if (mServicesRdy) {
-            //TODO LIST：初始化后，扫描到服务
-            //enableSensors(true);
-            // enableNotifications(true);
 
-           /* if (sendHeartBeatTask.getStatus() != AsyncTask.Status.RUNNING) {
-                sendHeartBeatTask.execute();
-            }*/
-            //   sendMsg("on");
             if (!heartBeatThread.isAlive()) {
                 heartBeatThread.start();
             }
             enableNotificationForLock(true);
             ib_device.setImageResource(R.drawable.icon_diaper_light);
-
         }
         else {
-/*
-            setError("Failed to read services");
-*/
+            Log.e(TAG, "Failed to read services");
         }
     }
 
-    private void enableNotifications(boolean enable) {
-        for (Sensor sensor : mEnabledSensors) {
-            //TODO LIST：data也是一个单独的characteristic
-            UUID servUuid = sensor.getService();
-            UUID dataUuid = sensor.getData();
-            BluetoothGattService serv = mBtGatt.getService(servUuid);
-            BluetoothGattCharacteristic charac = serv.getCharacteristic(dataUuid);
-
-            mBluetoothLeService.setCharacteristicNotification(charac,enable);
-            mBluetoothLeService.waitIdle(GATT_TIMEOUT);
-        }
-    }
-
-    private void enableSensors(boolean enable) {
-        for (Sensor sensor : mEnabledSensors) {
-            UUID servUuid = sensor.getService();
-            UUID confUuid = sensor.getConfig();
-
-            // Skip keys
-            if (confUuid == null)
-                break;
-
-            // Barometer calibration
-            if (confUuid.equals(SensorTag.UUID_BAR_CONF) && enable) {
-                //  calibrateBarometer();
-            }
-
-            BluetoothGattService serv = mBtGatt.getService(servUuid);
-            BluetoothGattCharacteristic charac = serv.getCharacteristic(confUuid);
-
-            //TODO LIST：除了Gyroscope：0：disable，7 enable，其余的均是0disable 1 enable
-            byte value =  enable ? sensor.getEnableSensorCode() : Sensor.DISABLE_SENSOR_CODE;
-            mBluetoothLeService.writeCharacteristic(charac, value);
-            mBluetoothLeService.waitIdle(GATT_TIMEOUT);
-
-        }
-
-    }
 
     private void enableNotificationForLock(boolean enable) {
 
@@ -643,7 +586,6 @@ public class MainActivity extends BaseActivity {
         if (RxService == null) {
             return;
         }
-
 
         UUID TX_CHAR_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
         BluetoothGattCharacteristic TxChar = RxService.getCharacteristic(TX_CHAR_UUID);
@@ -674,14 +616,13 @@ public class MainActivity extends BaseActivity {
                     displayServices();
 
                 } else {
-                    //  Toast.makeText(getApplication(), "Service discovery failed", Toast.LENGTH_LONG).show();
+                     Toast.makeText(getApplication(), "Service discovery failed", Toast.LENGTH_LONG).show();
                     return;
                 }
             } else if (BluetoothLeService.ACTION_DATA_NOTIFY.equals(action)) {
                 // Notification
                 final byte  [] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 String uuidStr = intent.getStringExtra(BluetoothLeService.EXTRA_UUID);
-
                 onCharacteristicChanged(uuidStr, value);
 
                 Log.i("进入Notify方法", "ACTION_DATA_NOTIFY");
@@ -775,7 +716,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void sendingAlarm(byte humi) {
-        if (humi < 50) {
+        if (humi < alarmHumity) {
             return;
         }
         iv_emotion.setVisibility(View.VISIBLE);
@@ -810,19 +751,41 @@ public class MainActivity extends BaseActivity {
      * popup number picker
      */
     public void onAnimationStyle(View view) {
-        NumberPicker picker = new NumberPicker(this);
-        picker.setAnimationStyle(R.style.Animation_CustomPopup);
-        picker.setOffset(1);//偏移量
-        picker.setRange(10, 60);//数字范围
-        picker.setSelectedItem(10);
-        picker.setLabel("秒");
-        picker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
+       /* NumberPicker tempPicker = new NumberPicker(this);
+        tempPicker.setAnimationStyle(R.style.Animation_CustomPopup);
+        tempPicker.setOffset(1);//偏移量
+        tempPicker.setRange(10, 100);//数字范围
+        tempPicker.setSelectedItem(10);
+        tempPicker.setLabel("°C");
+        tempPicker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
             @Override
             public void onOptionPicked(String option) {
-                Toast.makeText(MainActivity.this, "Time interval is " + option, Toast.LENGTH_SHORT).show();
+
+                alarmTemp = Float.parseFloat(option);
+                // Toast.makeText(MainActivity.this, "Time interval is " + option, Toast.LENGTH_SHORT).show();
             }
         });
-        picker.show();
+        tempPicker.show();*/
+
+        NumberPicker humilitypicker = new NumberPicker(this);
+        humilitypicker.setAnimationStyle(R.style.Animation_CustomPopup);
+        humilitypicker.setOffset(1);//偏移量
+        humilitypicker.setTitleText("湿度报警设置");
+        humilitypicker.setRange(10, 100);//数字范围
+        humilitypicker.setSelectedItem((int)(alarmHumity));
+        humilitypicker.setLabel("度");
+        humilitypicker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
+            @Override
+            public void onOptionPicked(String option) {
+                alarmHumity = Float.parseFloat(option);
+
+                AlarmDetail alarmDetail = new AlarmDetail();
+                alarmDetail.setAlarmHum(alarmHumity);
+                alarmDetail.setAlarmTemp(alarmTemp);
+                new AlarmDetailManager().saveAlarmDetail(MainActivity.this,alarmDetail);
+            }
+        });
+        humilitypicker.show();
     }
 
     /***
@@ -909,19 +872,12 @@ public class MainActivity extends BaseActivity {
             while (mScanning) {
                 publishProgress(0);
                 try {
-                    Thread.sleep(1000);
+                    Log.i(TAG, "ConnectDemoTask:doInBackground"+Thread.currentThread().getId()+"");
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-              /*  for(int i=0; i<10; i++){
-                    publishProgress(Integer.valueOf(i));
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }*/
             return null;
         }
 
@@ -929,6 +885,7 @@ public class MainActivity extends BaseActivity {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
             flag = !flag;
+            Log.i(TAG, "ConnectDemoTask:onProgressUpdate"+Thread.currentThread().getId()+"");
             int imgId = flag ? R.drawable.icon_diaper_dark : R.drawable.icon_diaper_light;
             ib_device.setImageResource(imgId);
 
@@ -938,6 +895,7 @@ public class MainActivity extends BaseActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            Log.i(TAG, "onProgressUpdate:onPostExecute"+Thread.currentThread().getId() + "");
             if (mBluetoothLeService == null) {
                 ib_device.setImageResource(R.drawable.icon_diaper_alert);
                 Toast.makeText(MainActivity.this, "设备连接失败", Toast.LENGTH_SHORT).show();
@@ -950,73 +908,22 @@ public class MainActivity extends BaseActivity {
                 ib_device.setImageResource(R.drawable.icon_diaper_alert);
             }
 
-             /*   if (mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT) ==
-                        BluetoothGatt.STATE_CONNECTED) {
-                    ib_device.setImageResource(R.drawable.icon_diaper_light);
-                }
-                else{
-                    ib_device.setImageResource(R.drawable.icon_diaper_alert);
-                }*/
-
         }
     }//end of ConnectDemoTask
 
-    /***
-     * added by predator
-     * used for demo purpose only
-     */
-/*
-    private class SendHeartBeatTask extends AsyncTask<Void, Integer, Void>{
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            while (isConnected) {
-                try {
-                    Log.i(TAG, "发送心跳");
-                    sendMsg("on");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            int a= 2;
-
-        }
-    }//end of ConnectDemoTask
-*/
 
 
     // handler类接收数据
     Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
-                // tvShow.setText(Integer.toString(i++));
                 sendMsg("on");
-                Log.i(TAG,"发送心跳");
+                Log.i(TAG, "发送心跳");
+                Log.i(TAG, "handler:"+Thread.currentThread().getId()+"");
             }
         };
     };
 
-    // 线程类
     class SendHeartBeat implements Runnable {
 
         @Override
