@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.worldlink.locker" >
+    package="com.worldlink.locker">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -122,9 +122,18 @@
 
         </activity>
 
+        <activity
+            android:name="com.worldlink.locker.activity.UpdateTipActivity"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/title_activity_update_tip"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.Dialog" />
+
         <service
             android:name="com.worldlink.locker.services.BluetoothLeService"
             android:enabled="true" />
+        <service android:name="com.worldlink.locker.UpdateService" />
+
     </application>
 
 </manifest>

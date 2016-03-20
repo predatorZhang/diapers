@@ -4,6 +4,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="app_versionName">3.1</string>
+    <string name="app_versionCode">2</string>
     <string-array name="arr_locks">
         <item>家</item>
         <item>学校</item>
@@ -14,6 +16,8 @@
     <string name="bt_not_supported">不支持蓝牙</string>
     <string name="bt_on">蓝牙设备已开启</string>
     <string name="bt_not_on">蓝牙开启失败</string>
+    <string name="title_activity_update_tip">UpdateTipActivity</string>
+
 
     <string-array name="device_filter"><item>BLE_REMOTE</item></string-array>
 <!--

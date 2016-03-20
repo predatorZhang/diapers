@@ -244,6 +244,7 @@ public class Global {
         return null;
     }
 
+
     private static String getWeek(long time) {
         Calendar today = Calendar.getInstance();
         today.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);

@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.tencent.android.tpush.XGPushManager;
 import com.tencent.android.tpush.service.XGPushService;
 import com.worldlink.locker.R;
+import com.worldlink.locker.UpdateService;
 import com.worldlink.locker.common.AlarmDetail;
 import com.worldlink.locker.common.AlarmDetailManager;
 import com.worldlink.locker.services.BleDeviceInfo;
@@ -162,11 +163,19 @@ public class MainActivity extends BaseActivity {
 
         // 调用下，防止收到上次登陆账号的通知
         XGPushManager.registerPush(this, "*");
-
         updateNotifyService();
         pushInXiaomi();
+
+        startUpdateService();
     }
 
+    private void startUpdateService() {
+        Intent intent = new Intent(this, UpdateService.class);
+        intent.putExtra(UpdateService.EXTRA_BACKGROUND, true);
+        intent.putExtra(UpdateService.EXTRA_WIFI, true);
+        intent.putExtra(UpdateService.EXTRA_DEL_OLD_APK, true);
+        startService(intent);
+    }
     //TODO LIST:仅仅用于测试
     private void updateNotifyService() {
         boolean needPush = true;
