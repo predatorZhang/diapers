@@ -32,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tencent.android.tpush.XGPushManager;
+import com.tencent.android.tpush.service.XGPushService;
 import com.worldlink.locker.R;
 import com.worldlink.locker.common.AlarmDetail;
 import com.worldlink.locker.common.AlarmDetailManager;
@@ -158,8 +160,29 @@ public class MainActivity extends BaseActivity {
         }
         Log.i(TAG, "UI Thread:"+Thread.currentThread().getId()+"");
 
+        // 调用下，防止收到上次登陆账号的通知
+        XGPushManager.registerPush(this, "*");
+
+        updateNotifyService();
+        pushInXiaomi();
     }
 
+    //TODO LIST:仅仅用于测试
+    private void updateNotifyService() {
+        boolean needPush = true;
+        if (needPush) {
+            XGPushManager.registerPush(this, "shit");
+        } else {
+            XGPushManager.registerPush(this, "*");
+        }
+    }
+
+    // 信鸽文档推荐调用，防止在小米手机上收不到推送
+    private void pushInXiaomi() {
+        Context context = getApplicationContext();
+        Intent service = new Intent(context, XGPushService.class);
+        context.startService(service);
+    }
 
     // Activity result handling
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
