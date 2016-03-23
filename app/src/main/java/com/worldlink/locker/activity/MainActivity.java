@@ -165,7 +165,6 @@ public class MainActivity extends BaseActivity {
         XGPushManager.registerPush(this, "*");
         updateNotifyService();
         pushInXiaomi();
-
         startUpdateService();
     }
 
