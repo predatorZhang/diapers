@@ -82,7 +82,23 @@
             android:layout_centerVertical="true"
             />
 
+
     </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv_cell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:text="电量正常"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20px"
+        android:visibility="invisible"
+        />
+
     <ImageButton
         android:id="@+id/iv_emotion"
         android:src="@drawable/icon_cry_2"

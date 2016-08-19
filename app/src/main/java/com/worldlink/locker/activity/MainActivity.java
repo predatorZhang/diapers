@@ -82,6 +82,9 @@ public class MainActivity extends BaseActivity {
     @ViewById
     public TextView tv_temp;
 
+    @ViewById
+    public TextView tv_cell;
+
     private MediaPlayer myMediaPlayer;
     private Vibrator vibrator;
     private boolean isRingOn = true;
@@ -688,6 +691,17 @@ public class MainActivity extends BaseActivity {
                 try {
                     byte temp = value[0];
                     byte humi = value[1];
+                    byte cell = value[2];
+                    if (cell != 70) {
+                        //TODO LIST:电量异常 E
+                        tv_cell.setVisibility(View.VISIBLE);
+                        tv_cell.setText("低电量");
+                    } else {
+                        //TODO LIST：电量正常 F
+/*
+                        tv_cell.setText("电量正常");
+*/
+                    }
 
                     tv_temp.setText(temp+"°C");
                     sv_progress.setPercent(humi / (float) 100);
