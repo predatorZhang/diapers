@@ -38,6 +38,7 @@ import com.worldlink.locker.R;
 import com.worldlink.locker.UpdateService;
 import com.worldlink.locker.common.AlarmDetail;
 import com.worldlink.locker.common.AlarmDetailManager;
+import com.worldlink.locker.common.DevicePicker;
 import com.worldlink.locker.services.BleDeviceInfo;
 import com.worldlink.locker.services.BleDeviceManager;
 import com.worldlink.locker.services.BluetoothLeService;
@@ -58,6 +59,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import cn.qqtheme.framework.picker.ConstellationPicker;
 import cn.qqtheme.framework.picker.NumberPicker;
 import cn.qqtheme.framework.picker.OptionPicker;
 
@@ -117,6 +119,8 @@ public class MainActivity extends BaseActivity {
     private float  alarmTemp;
     private float  alarmHumity;
 
+    DevicePicker devicePicker;
+
     @AfterViews
     public void init() {
 
@@ -162,13 +166,37 @@ public class MainActivity extends BaseActivity {
             alarmHumity = alarmDetail.getAlarmHum();
             alarmTemp = alarmDetail.getAlarmTemp();
         }
-        Log.i(TAG, "UI Thread:"+Thread.currentThread().getId()+"");
+        Log.i(TAG, "UI Thread:" + Thread.currentThread().getId() + "");
 
         // 调用下，防止收到上次登陆账号的通知
         XGPushManager.registerPush(this, "*");
         updateNotifyService();
         pushInXiaomi();
         startUpdateService();
+
+        //初始化DevicePicker
+        devicePicker = new DevicePicker(this);
+        devicePicker.setAnimationStyle(R.style.Animation_CustomPopup);
+        devicePicker.setOffset(1);//偏移量
+        devicePicker.setTitleText("设备列表");
+        devicePicker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
+            @Override
+            public void onOptionPicked(String option) {
+
+                BleDeviceInfo bleDeviceInfo = devicePicker.getBluetoothDeviceByAddr(option);
+                if (mScanning)
+                    stopScan();
+                mBluetoothDevice = bleDeviceInfo.getBluetoothDevice();
+                if (bleDeviceManager.getmConnIndex() == BleDeviceManager.NO_DEVICE) {
+                    bleDeviceManager.setmConnIndex(bleDeviceInfo);
+                    onConnect();
+                } else {
+                    if (bleDeviceManager.getmConnIndex() != BleDeviceManager.NO_DEVICE) {
+                        mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
+                    }
+                }
+            }
+        });
     }
 
     private void startUpdateService() {
@@ -422,9 +450,11 @@ public class MainActivity extends BaseActivity {
         // Start device discovery
         if (mBleSupported) {
             bleDeviceManager.clear();
+            //TODO LIST:predator
+            devicePicker.setDeviceList(null);
             scanLeDevice(true);
             //TODO LIST:修改连接的状态
-            new ConnectDemoTask().execute();
+           // new ConnectDemoTask().execute();
             if (!mScanning) {
                 Log.e(TAG, "bluetooth device scanning falied");
             }
@@ -466,23 +496,11 @@ public class MainActivity extends BaseActivity {
                 public void run() {
                     // Filter devices
                     bleDeviceManager.updateOrAdd(device, rssi);
-                    //TODO LIST:无设备则直接返回
-                    if (bleDeviceManager.getDevices().size() == 0) {
-                        return;
-                    }
-                    Log.i(TAG, "onLeScan"+Thread.currentThread().getId());
+                    devicePicker.setDeviceList(bleDeviceManager.getDevices());
 
-                    if (mScanning)
-                        stopScan();
-
-                    mBluetoothDevice = ((BleDeviceInfo)bleDeviceManager.getDevices().get(0)).getBluetoothDevice();
-                    if (bleDeviceManager.getmConnIndex() == BleDeviceManager.NO_DEVICE) {
-                        bleDeviceManager.setmConnIndex(0);
-                        //TODO LIST:避免重复连接同一个设备
-                        if(mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT)==
-                                BluetoothGatt.STATE_DISCONNECTED){
-                            onConnect();
-                        }
+                        if (!devicePicker.isShowing() && devicePicker.deviceList!=null &&
+                                devicePicker.deviceList.size() != 0) {
+                            devicePicker.show();
                     }
                 }
 
@@ -554,7 +572,9 @@ public class MainActivity extends BaseActivity {
 
                 if (status == BluetoothGatt.GATT_SUCCESS)
                 {
+/*
                     isConnected = false;
+*/
                     Log.i(TAG, "Disconnect device:" + mBluetoothDevice.getName());
 
                 } else {
@@ -564,7 +584,9 @@ public class MainActivity extends BaseActivity {
                 mBluetoothLeService.close();
                 ib_device.setImageResource(R.drawable.icon_diaper_alert);
 
+/*
                 startScan();//重新扫描设备
+*/
 
             } else {
                 Log.w(TAG,"Unknown action: " + action);
@@ -703,7 +725,7 @@ public class MainActivity extends BaseActivity {
 */
                     }
 
-                    tv_temp.setText(temp+"°C");
+                    tv_temp.setText(temp + "°C");
                     sv_progress.setPercent(humi / (float) 100);
                     if (humi <= 20) {
                         tv_feel.setText("干爽");
@@ -790,27 +812,14 @@ public class MainActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+
+
     /**
      * Added by Stevens
      *
      * popup number picker
      */
     public void onAnimationStyle(View view) {
-       /* NumberPicker tempPicker = new NumberPicker(this);
-        tempPicker.setAnimationStyle(R.style.Animation_CustomPopup);
-        tempPicker.setOffset(1);//偏移量
-        tempPicker.setRange(10, 100);//数字范围
-        tempPicker.setSelectedItem(10);
-        tempPicker.setLabel("°C");
-        tempPicker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
-            @Override
-            public void onOptionPicked(String option) {
-
-                alarmTemp = Float.parseFloat(option);
-                // Toast.makeText(MainActivity.this, "Time interval is " + option, Toast.LENGTH_SHORT).show();
-            }
-        });
-        tempPicker.show();*/
 
         NumberPicker humilitypicker = new NumberPicker(this);
         humilitypicker.setAnimationStyle(R.style.Animation_CustomPopup);
@@ -832,131 +841,6 @@ public class MainActivity extends BaseActivity {
         });
         humilitypicker.show();
     }
-
-    /***
-     * added by Stevens
-     *
-     * used for demo purose only
-     */
-    private class ProgressDemoTask extends AsyncTask<Void, Integer, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            for (int i = 0; i <= 100; i++) {
-                publishProgress(Integer.valueOf(i));
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            int progress = values[0];
-            sv_progress.setPercent(progress / (float) 100);
-            if( progress <= 20 ){
-                tv_feel.setText("干爽");
-            }
-            else if(progress > 20 && progress <= 60){
-                tv_feel.setText("舒适");
-            }else if(progress > 60 && progress <= 100) {
-                tv_feel.setText("潮湿");
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            iv_emotion.setVisibility(View.VISIBLE);
-            myMediaPlayer = new MediaPlayer();//MediaPlayer.create(this, R.raw.ptt_not);
-            try {
-//				AssetFileDescriptor fd = getResources().openRawResourceFd(R.raw.ptt_not);
-                AssetFileDescriptor fd = getResources().openRawResourceFd(R.raw.beep);
-                long offset = fd.getStartOffset();
-                long length = fd.getLength();
-                if(isRingOn){
-                    myMediaPlayer.setLooping(true);
-                    myMediaPlayer.setDataSource(fd.getFileDescriptor(), offset, length);
-                    myMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    myMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mp) {
-                            mp.start();
-                        }
-                    });
-                    myMediaPlayer.prepareAsync();
-                }else{
-                    vibrator  = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-                    vibrator.vibrate(new long[]{200, 100, 200,100, 200,100}, 0);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }//end of ProgressDemoTask
-
-    /***
-     * added by Stevens
-     * used for demo purpose only
-     */
-    private class ConnectDemoTask extends AsyncTask<Void, Integer, Void>{
-
-        private volatile boolean  flag = true;
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            while (mScanning) {
-                publishProgress(0);
-                try {
-                    Log.i(TAG, "ConnectDemoTask:doInBackground"+Thread.currentThread().getId()+"");
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            flag = !flag;
-            Log.i(TAG, "ConnectDemoTask:onProgressUpdate"+Thread.currentThread().getId()+"");
-            int imgId = flag ? R.drawable.icon_diaper_dark : R.drawable.icon_diaper_light;
-            ib_device.setImageResource(imgId);
-
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            Log.i(TAG, "onProgressUpdate:onPostExecute"+Thread.currentThread().getId() + "");
-            if (mBluetoothLeService == null) {
-                ib_device.setImageResource(R.drawable.icon_diaper_alert);
-                Toast.makeText(MainActivity.this, "设备连接失败", Toast.LENGTH_SHORT).show();
-            }
-
-            if (isConnected) {
-                ib_device.setImageResource(R.drawable.icon_diaper_light);
-            }
-            else{
-                ib_device.setImageResource(R.drawable.icon_diaper_alert);
-            }
-
-        }
-    }//end of ConnectDemoTask
-
-
 
     // handler类接收数据
     Handler handler = new Handler() {
