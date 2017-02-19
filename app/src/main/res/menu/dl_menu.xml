@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.worldlink.locker.activity.DeviceListActivity" >
+    <item
+        android:id="@+id/action_add"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:icon="@drawable/menu_ib_search"
+        android:title="@string/action_settings"/>
+</menu>

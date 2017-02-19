@@ -21,18 +21,18 @@ import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.AnimationRes;
 
-//@EActivity(R.layout.splash)
-//@NoTitle
-//@Fullscreen
+@EActivity(R.layout.splash)
+@NoTitle
+@Fullscreen
 public class SplashActivity extends BaseActivity {
 
-//    @ViewById
+    @ViewById
     ImageView image;
-//    @ViewById
+    @ViewById
     TextView title;
-//    @ViewById
+    @ViewById
     View foreMask;
-//    @AnimationRes
+   @AnimationRes
     Animation entrance;
 
     Uri background = null;
@@ -55,11 +55,11 @@ public class SplashActivity extends BaseActivity {
     };
 
 
-//    @AfterViews
+    @AfterViews
     void init() {
 
         ImageSize imageSize = new ImageSize(LockerApplication.sWidthPix, LockerApplication.sHeightPix);
-        image.setImageBitmap(imageLoadTool.imageLoader.loadImageSync("drawable://" + R.drawable.splash, imageSize));
+        image.setImageBitmap(imageLoadTool.imageLoader.loadImageSync("drawable://" + R.drawable.logo_hainiu1, imageSize));
 
         entrance.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -81,9 +81,14 @@ public class SplashActivity extends BaseActivity {
     }
 
     void next() {
-        Intent intent = new Intent(this, MainActivity.class);
+
+        Intent intent = new Intent(this, DeviceListActivity_.class);
         startActivity(intent);
         overridePendingTransition(R.anim.scroll_in, R.anim.scroll_out);
+
+      /*  Intent intent = new Intent(this, DeviceListActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.scroll_in, R.anim.scroll_out);*/
         finish();
     }
 

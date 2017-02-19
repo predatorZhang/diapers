@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
-import com.worldlink.locker.services.BleDeviceInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;

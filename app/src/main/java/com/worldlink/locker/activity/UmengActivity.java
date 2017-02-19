@@ -1,5 +1,6 @@
 package com.worldlink.locker.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
@@ -8,7 +9,7 @@ import android.widget.Toast;
 import com.umeng.analytics.MobclickAgent;
 
 
-public class UmengActivity extends ActionBarActivity {
+public class UmengActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -32,7 +32,7 @@
   contact Texas Instruments Incorporated at www.TI.com
 
  **************************************************************************************************/
-package com.worldlink.locker.services;
+package com.worldlink.locker.common;
 
 import android.bluetooth.BluetoothDevice;
 

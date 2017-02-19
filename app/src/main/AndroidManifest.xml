@@ -30,9 +30,8 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher0"
+        android:icon="@drawable/logo_hainiu"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppTheme"
         android:supportsRtl="true"
         android:name="com.worldlink.locker.LockerApplication">
 
@@ -110,16 +109,23 @@
         <activity
             android:name="com.worldlink.locker.activity.MainActivity_"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.worldlink.locker.activity.DeviceListActivity_"
+            android:label="@string/app_name"
+            android:icon="@drawable/icon"
+            >
+        </activity>
+
+        <activity
+            android:name="com.worldlink.locker.activity.SplashActivity_"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppTheme"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name="com.worldlink.locker.activity.SplashActivity"
-            android:label="@string/app_name" >
-
         </activity>
 
         <activity

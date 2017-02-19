@@ -13,7 +13,10 @@
     </style>
 
     <!-- AppBar Style -->
-    
+    <style name="ActionbarNoIcon" parent="AppTheme">
+        <!--<item name="android:actionBarStyle">@style/ActionBarStyle</item>-->
+    </style>
+
     <style name="AppBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="selectableItemBackground">@null</item>
     </style>

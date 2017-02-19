@@ -8,13 +8,15 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.worldlink.locker.activity.MainActivity_"
+    tools:context="com.worldlink.locker.activity.MainActivity"
     android:background="@color/black">
     <ImageView
+        android:id="@+id/iv_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/bg_app_1"
+        android:src="@drawable/bg_16"
         android:scaleType="centerCrop"/>
+
 
     <ImageButton
         android:id="@+id/ib_device"
@@ -24,9 +26,10 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
-        android:src="@drawable/icon_diaper_alert"
+        android:src="@drawable/btn_dashborad"
         android:background="@color/transparent"
-        android:scaleType="centerInside"/>
+        android:scaleType="centerInside"
+        android:visibility="invisible"/>
     <ImageButton
         android:id="@+id/ib_setting"
         android:layout_width="32dp"
@@ -37,32 +40,143 @@
         android:layout_marginRight="20dp"
         android:onClick="onAnimationStyle"
         android:src="@drawable/icon_settings"
-        android:background="@color/transparent"/>
-    <org.demo.ballprogress.view.SinkView
-        android:id="@+id/sv_progress"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
-        android:layout_centerInParent="true"
-        />
+        android:background="@color/transparent"
+        android:visibility="invisible"/>
+
+   <LinearLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="5dp"
+       android:layout_marginTop="20dp"
+       android:orientation="horizontal"
+       >
+       <ImageView
+           android:layout_width="32dp"
+           android:layout_height="32dp"
+           android:id="@+id/ic_battery"
+           android:src="@drawable/ic_battery_half"
+           />
+       <TextView
+           android:id="@+id/tv_cell"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="@android:color/white"
+           android:layout_gravity="center_vertical"
+           android:layout_marginLeft="5sp"
+           android:textSize="16sp"
+           android:text="100%" />
+   </LinearLayout>
+    <!--
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:id="@+id/ic_battery_half"
+        android:src="@drawable/ic_battery_half"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="60dp"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentTop="true"/>
+    <TextView
+        android:id="@+id/tv_cell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/ic_battery_half"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:text="0%" />
+-->
+    <!--<org.demo.ballprogress.view.SinkView-->
+        <!--android:id="@+id/sv_progress"-->
+        <!--android:layout_width="240dp"-->
+        <!--android:layout_height="240dp"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--/>-->
+    <RelativeLayout
+        android:id="@+id/rl_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        >
+        <ImageView
+            android:layout_width="190dp"
+            android:layout_height="190dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/circle6"
+            />
+        <ImageView
+            android:id="@+id/iv_circle"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_centerInParent="true"
+
+             />
+
+        <ImageView
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/circle4"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:gravity="center|center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:text="甲醛"
+                android:textSize="16sp"
+                />
+            <TextView
+                android:id="@+id/tv_index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textColor="@android:color/white"
+                android:text="--"
+                android:textSize="32sp"
+                />
+
+            <TextView
+                android:id="@+id/tv_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:text="mg/m3"
+                android:textSize="16sp"
+
+
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sv_progress"
-        android:layout_marginTop="50dp"
+        android:layout_below="@id/rl_2"
+        android:layout_marginTop="20dp"
 
         >
         <ImageButton
             android:id="@+id/ib_ring"
-            android:layout_width="88dp"
-            android:layout_height="88dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_centerHorizontal="true"
-            android:padding="20dp"
+            android:padding="5dp"
             android:src="@drawable/icon_ring"
-            android:background="@color/transparent"
+            android:background="@drawable/circle7"
             android:scaleType="fitXY"
+            android:visibility="invisible"
+
             />
         <TextView
-            android:id="@+id/tv_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -70,6 +184,7 @@
             android:text="21.6°C"
             android:layout_toLeftOf="@id/ib_ring"
             android:layout_centerVertical="true"
+            android:visibility="invisible"
         />
         <TextView
             android:id="@+id/tv_feel"
@@ -80,25 +195,10 @@
             android:text="--"
             android:layout_toRightOf="@id/ib_ring"
             android:layout_centerVertical="true"
+            android:visibility="invisible"
             />
 
-
     </RelativeLayout>
-
-
-    <TextView
-        android:id="@+id/tv_cell"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:text="电量正常"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20px"
-        android:visibility="invisible"
-        />
-
     <ImageButton
         android:id="@+id/iv_emotion"
         android:src="@drawable/icon_cry_2"
@@ -108,33 +208,192 @@
         android:scaleType="centerInside"
         android:background="#AAC0C0C0"
         android:visibility="invisible"/>
+    <!-- index area-->
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:layout_alignParentBottom="true"
+    android:background="#77000000"
+    >
 
-    <!--ImageButton android:id="@+id/ib_info"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/info"
-        android:background="@android:color/transparent"
-        android:stateListAnimator="@anim/fab_anim"
-        android:elevation="5dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:scaleType="fitCenter"/>-->
-    <!--ImageButton android:id="@+id/ib_setting"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/share"
-        android:background="@android:color/transparent"
-        android:stateListAnimator="@anim/fab_anim"
-        android:elevation="5dp"
-        android:layout_marginRight="20dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@id/ib_info"
-        android:scaleType="fitCenter"/>-->
-    <!--com.rey.material.widget.SnackBar
-        android:id="@+id/info_sn"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:visibility="invisible"
-        android:layout_gravity="bottom"/>-->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:orientation="horizontal"
+    android:gravity="center|center"
+    >
+
+    <!--area 1 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center|center"
+        >
+        <LinearLayout
+            android:layout_width="@dimen/uidesign_linear_label_width"
+            android:layout_height="@dimen/uidesign_linear_label_height"
+            android:orientation="vertical"
+            android:gravity="center|center"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/uidesign_index_label_textsize"
+                android:text="温度"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:id="@+id/tv_temp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/uidesign_index_state_label_textsize"
+                android:text="--°C"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center|center"
+            >
+            <TextView
+                android:layout_width="@dimen/uidesign_index_label_width"
+                android:layout_height="@dimen/uidesign_index_label_height"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/uidesign_index_state_label_textsize"
+                android:text="--"
+                android:id="@+id/tv_temp_eval"
+                android:background="@drawable/oval"
+                android:gravity="center|center"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <!-- splitter -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:src="@drawable/split"/>
+    <!--area 2 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center|center"
+        >
+        <LinearLayout
+            android:layout_width="@dimen/uidesign_linear_label_width"
+            android:layout_height="@dimen/uidesign_linear_label_height"
+            android:orientation="vertical"
+            android:gravity="center|center"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/uidesign_index_label_textsize"
+                android:text="PM2.5"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:id="@+id/tv_pm"
+                android:textSize="@dimen/uidesign_index_state_label_textsize"
+                android:text="--"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center|center"
+            >
+            <TextView
+                android:layout_width="@dimen/uidesign_index_label_width"
+                android:layout_height="@dimen/uidesign_index_label_height"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/uidesign_index_state_label_textsize"
+                android:text="--"
+                android:id="@+id/tv_pm_eval"
+                android:background="@drawable/oval"
+                android:gravity="center|center"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- splitter -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:src="@drawable/split"/>
+    <!--area 3 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center|center"
+        >
+        <LinearLayout
+            android:layout_width="@dimen/uidesign_linear_label_width"
+            android:layout_height="@dimen/uidesign_linear_label_height"
+            android:orientation="vertical"
+            android:gravity="center|center"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/uidesign_index_label_textsize"
+                android:text="湿度"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/uidesign_index_state_label_textsize"
+                android:id="@+id/tv_hum"
+                android:text="--%"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center|center"
+            >
+            <TextView
+                android:layout_width="@dimen/uidesign_index_label_width"
+                android:layout_height="@dimen/uidesign_index_label_height"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/uidesign_index_state_label_textsize"
+                android:text="--"
+                android:id="@+id/tv_hum_eval"
+                android:background="@drawable/oval"
+                android:gravity="center|center"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
+
+
+
+</RelativeLayout>
+
 
 </RelativeLayout>
