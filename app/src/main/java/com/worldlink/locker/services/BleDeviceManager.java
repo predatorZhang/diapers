@@ -39,7 +39,9 @@ public class BleDeviceManager {
         if (n > 0) {
             boolean found = false;
             for (int i = 0; i < n && !found; i++) {
-                found = device.getName().equals(mDeviceFilter[i]);
+                if (device.getName()!=null) {
+                    found = device.getName().equals(mDeviceFilter[i]);
+                }
             }
             return found;
         } else {
@@ -58,7 +60,7 @@ public class BleDeviceManager {
 
     public void updateOrAdd(BluetoothDevice device, int rssi) {
 
-      //  if (checkDeviceFilter(device)) {
+        if (checkDeviceFilter(device)) {
             if (!deviceInfoExists(device.getAddress())) {
                 BleDeviceInfo dev = new BleDeviceInfo(device, rssi);
                 mDeviceInfoList.add(dev);
@@ -67,7 +69,7 @@ public class BleDeviceManager {
                 deviceInfo.updateRssi(rssi);
             }
 
-      //  }
+        }
 
     }
 

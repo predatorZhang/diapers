@@ -8,8 +8,8 @@ android {
         applicationId "com.worldlink.locker"
         minSdkVersion 18
         targetSdkVersion 23
-       /* versionCode 1
-        versionName "1.0"*/
+        versionCode 3
+        versionName "2.1"
     }
     buildTypes {
         release {
@@ -26,9 +26,11 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.github.rey5137:material:1.2.2'
     compile 'com.umeng.analytics:analytics:latest.integration'
+    compile 'com.koushikdutta.ion:ion:2.+'
     compile files('libs/universal-image-loader-1.9.4.jar')
     compile project(':library:WheelPicker')
     compile project(':library:Common')
+    compile files('libs/mid-sdk-2.20.jar')
 }
 
 //
