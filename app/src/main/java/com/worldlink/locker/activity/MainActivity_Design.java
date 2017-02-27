@@ -436,9 +436,9 @@ public class MainActivity_Design extends BaseActivity {
                         int offset_left = 255 - value_left;
                         int offset_middle = 255 - value_middle;
                         GradientDrawable drawable_left = (GradientDrawable) iv_circle_left.getBackground();
-                        drawable_left.setColor(Color.argb(255, offset_middle, value_middle, 0));
+                        drawable_left.setColor(Color.argb(255, offset_left, value_left, 0));
                         GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
-                        drawable_middle.setColor(Color.argb(255, offset_left, value_left, 0));
+                        drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
 
                         anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up);
                         anim_2.setAnimationListener(new Animation.AnimationListener() {
@@ -515,9 +515,9 @@ public class MainActivity_Design extends BaseActivity {
                         int offset_right = 255 - value_right;
                         int offset_middle = 255 - value_middle;
                         GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
-                        drawable_right.setColor(Color.argb(255, offset_middle, value_middle, 0));
+                        drawable_right.setColor(Color.argb(255, offset_right, value_right, 0));
                         GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
-                        drawable_middle.setColor(Color.argb(255, offset_right, value_right, 0));
+                        drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
 
                         anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up);
                         anim_2.setAnimationListener(new Animation.AnimationListener() {
@@ -1190,13 +1190,13 @@ public class MainActivity_Design extends BaseActivity {
 
             if(progress % 10 == 0){
                 Random r = new Random(System.currentTimeMillis());
-                int value_random = r.nextInt();
+                int value_random = Math.abs(r.nextInt());
                 GradientDrawable drawable_left = (GradientDrawable) iv_circle_left.getBackground();
                 drawable_left.setColor(Color.argb(255, 255 - value_random%255 , value_random%255, 0));
                 tv_index_left.setText(String.valueOf(value_random%255));
 
 
-                int value_random2 = r.nextInt();
+                int value_random2 = Math.abs(r.nextInt());
                 GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
                 drawable_right.setColor(Color.argb(255, 255 - value_random2%255 , value_random2%255, 0));
                 tv_index_right.setText(String.valueOf(value_random2%255));
