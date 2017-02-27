@@ -16,12 +16,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,15 +29,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rey.material.app.Dialog;
 import com.rey.material.app.DialogFragment;
 import com.rey.material.app.SimpleDialog;
+//import com.rey.material.widget.RelativeLayout;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.Spinner;
 import com.worldlink.locker.R;
@@ -51,12 +51,10 @@ import com.worldlink.locker.services.BluetoothLeService;
 import com.worldlink.locker.services.Sensor;
 import com.worldlink.locker.services.SensorTag;
 
-import org.demo.ballprogress.view.SinkView;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import cn.qqtheme.framework.picker.NumberPicker;
@@ -80,8 +78,8 @@ public class MainActivity_Design extends BaseActivity {
     //added by Stevens
 //    private SinkView sv_progress;
     private int[] bg_ids = {R.drawable.bg_1,R.drawable.bg_1_blur,R.drawable.bg_2, R.drawable.bg_2_blur, R.drawable.bg_3, R.drawable.bg_3_blur, R.drawable.bg_4, R.drawable.bg_4_blur, R.drawable.bg_5,R.drawable.bg_6,R.drawable.bg_7,R.drawable.bg_8,};
-    private TextView tv_index;
-    private ImageView iv_circle;
+//    private TextView tv_index;
+//    private ImageView iv_circle;
     private ImageView iv_background;
     private ImageButton ib_device;
     private ImageView iv_emotion;
@@ -93,6 +91,33 @@ public class MainActivity_Design extends BaseActivity {
     private boolean isRingOn = true;
     private boolean isConnected = false;
     private boolean unpressed = true;
+
+    //added by Stevens
+    //animated index indicator
+    //middle widget
+    private TextView tv_index_middle;
+    private TextView tv_title_middle;
+    private TextView tv_unit_middle;
+    private RelativeLayout rl_middle;
+    private ImageView iv_circle_middle;
+
+    //left widget
+    private TextView tv_index_left;
+    private TextView tv_title_left;
+    private TextView tv_unit_left;
+    private RelativeLayout rl_left;
+    private ImageView iv_circle_left;
+    //right widget
+    private TextView tv_index_right;
+    private TextView tv_title_right;
+    private TextView tv_unit_right;
+    private RelativeLayout rl_right;
+    private ImageView iv_circle_right;
+
+
+    private Animation anim_1;
+    private Animation anim_2;
+    private boolean transition = false;
 
     private static final String TAG = "MainActivity";
 
@@ -345,9 +370,188 @@ public class MainActivity_Design extends BaseActivity {
         setContentView(R.layout.activity_main_2);
         //link widgets
 //        sv_progress = (SinkView) findViewById(R.id.sv_progress);
-        tv_index = (TextView) findViewById(R.id.tv_index);
-        iv_circle = (ImageView) findViewById(R.id.iv_circle);
-        iv_circle.setBackgroundResource(R.drawable.circle5);
+//        tv_index = (TextView) findViewById(R.id.tv_index);
+//        iv_circle = (ImageView) findViewById(R.id.iv_circle);
+//        iv_circle.setBackgroundResource(R.drawable.circle5);
+        rl_middle = (RelativeLayout) findViewById(R.id.rl_middle);
+        tv_index_middle = (TextView) findViewById(R.id.tv_index_middle);
+        tv_title_middle = (TextView) findViewById(R.id.tv_title_middle);
+        tv_unit_middle = (TextView) findViewById(R.id.tv_unit_middle);
+        iv_circle_middle = (ImageView) findViewById(R.id.iv_circle_middle);
+        iv_circle_middle.setBackgroundResource(R.drawable.circle5);
+
+        rl_left = (RelativeLayout) findViewById(R.id.rl_left);
+        tv_index_left = (TextView) findViewById(R.id.tv_index_left);
+        tv_title_left = (TextView) findViewById(R.id.tv_title_left);
+        tv_unit_left = (TextView) findViewById(R.id.tv_unit_left);
+        iv_circle_left = (ImageView) findViewById(R.id.iv_circle_left);
+        iv_circle_left.setBackgroundResource(R.drawable.circle5);
+
+        rl_right = (RelativeLayout) findViewById(R.id.rl_right);
+        tv_index_right = (TextView) findViewById(R.id.tv_index_right);
+        tv_title_right = (TextView) findViewById(R.id.tv_title_right);
+        tv_unit_right = (TextView) findViewById(R.id.tv_unit_right);
+        iv_circle_right = (ImageView) findViewById(R.id.iv_circle_right);
+        iv_circle_right.setBackgroundResource(R.drawable.circle5);
+
+        rl_left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(transition){
+                    //animation hasn't finished
+                    return;
+                }
+                transition = true;
+                v.setVisibility(View.INVISIBLE);
+                rl_middle.setVisibility(View.INVISIBLE);
+                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down);
+                v.startAnimation(anim_1);
+                rl_middle.startAnimation(anim_1);
+
+                anim_1.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        anim_1 = null;
+                        //switch content
+                        String str = (String) tv_index_left.getText();
+                        tv_index_left.setText(tv_index_middle.getText());
+                        tv_index_middle.setText(str);
+
+                        str = (String) tv_title_left.getText();
+                        tv_title_left.setText(tv_title_middle.getText());
+                        tv_title_middle.setText(str);
+
+                        str = (String) tv_unit_left.getText();
+                        tv_unit_left.setText(tv_unit_middle.getText());
+                        tv_unit_middle.setText(str);
+
+                        int value_left = Integer.valueOf((String) tv_index_left.getText());
+                        int value_middle=  Integer.valueOf((String) tv_index_middle.getText());
+
+                        int offset_left = 255 - value_left;
+                        int offset_middle = 255 - value_middle;
+                        GradientDrawable drawable_left = (GradientDrawable) iv_circle_left.getBackground();
+                        drawable_left.setColor(Color.argb(255, offset_middle, value_middle, 0));
+                        GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
+                        drawable_middle.setColor(Color.argb(255, offset_left, value_left, 0));
+
+                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up);
+                        anim_2.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                rl_left.setVisibility(View.VISIBLE);
+                                rl_middle.setVisibility(View.VISIBLE);
+                                anim_2 = null;
+                                transition = false;
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+                        rl_left.startAnimation(anim_2);
+                        rl_middle.startAnimation(anim_2);
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+
+                });
+            }
+        });
+        rl_right.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(transition){
+                    //animation hasn't finished
+                    return;
+                }
+                transition = true;
+                v.setVisibility(View.INVISIBLE);
+                rl_middle.setVisibility(View.INVISIBLE);
+                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down);
+                v.startAnimation(anim_1);
+                rl_middle.startAnimation(anim_1);
+
+                anim_1.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        anim_1 = null;
+                        //switch content
+                        String str = (String) tv_index_right.getText();
+                        tv_index_right.setText(tv_index_middle.getText());
+                        tv_index_middle.setText(str);
+
+                        str = (String) tv_title_right.getText();
+                        tv_title_right.setText(tv_title_middle.getText());
+                        tv_title_middle.setText(str);
+
+                        str = (String) tv_unit_right.getText();
+                        tv_unit_right.setText(tv_unit_middle.getText());
+                        tv_unit_middle.setText(str);
+
+                        int value_right = Integer.valueOf((String) tv_index_right.getText());
+                        int value_middle=  Integer.valueOf((String) tv_index_middle.getText());
+
+                        int offset_right = 255 - value_right;
+                        int offset_middle = 255 - value_middle;
+                        GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
+                        drawable_right.setColor(Color.argb(255, offset_middle, value_middle, 0));
+                        GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
+                        drawable_middle.setColor(Color.argb(255, offset_right, value_right, 0));
+
+                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up);
+                        anim_2.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                rl_right.setVisibility(View.VISIBLE);
+                                rl_middle.setVisibility(View.VISIBLE);
+                                anim_2 = null;
+                                transition = false;
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+                        rl_right.startAnimation(anim_2);
+                        rl_middle.startAnimation(anim_2);
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+
+                });
+            }
+        });
 
         SharedPreferences prefs = getSharedPreferences("background", Context.MODE_PRIVATE);
         int index = prefs.getInt("bg_index", 0);
@@ -979,9 +1183,26 @@ public class MainActivity_Design extends BaseActivity {
 //            sv_progress.setPercent(progress / (float) 100);
             int value = progress;//(int) (progress / (float) 100 * 255.0f);
             int offset = 255 - value;
-            GradientDrawable drawable = (GradientDrawable) iv_circle.getBackground();
-            drawable.setColor(Color.argb(255, offset, value, 0));
-            tv_index.setText(String.valueOf(value));
+
+            GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
+            drawable_middle.setColor(Color.argb(255, offset, value, 0));
+            tv_index_middle.setText(String.valueOf(value));
+
+            if(progress % 10 == 0){
+                Random r = new Random(System.currentTimeMillis());
+                int value_random = r.nextInt();
+                GradientDrawable drawable_left = (GradientDrawable) iv_circle_left.getBackground();
+                drawable_left.setColor(Color.argb(255, 255 - value_random%255 , value_random%255, 0));
+                tv_index_left.setText(String.valueOf(value_random%255));
+
+
+                int value_random2 = r.nextInt();
+                GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
+                drawable_right.setColor(Color.argb(255, 255 - value_random2%255 , value_random2%255, 0));
+                tv_index_right.setText(String.valueOf(value_random2%255));
+            }
+
+
             if( progress <= 20 ){
                 tv_feel.setText("干爽");
             }
