@@ -2,6 +2,7 @@ package com.worldlink.locker.activity;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -41,16 +42,26 @@ public class SplashActivity extends BaseActivity {
 
     private ImageLoadTool imageLoadTool = new ImageLoadTool();
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.splash);
+        mHandler.sendEmptyMessageDelayed(0, 300);
+    }
 
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             // TODO Auto-generated method stub
-            if (msg.what == 0) {
-                foreMask.startAnimation(entrance);
-            } else if (msg.what == 1) {
-                next();
-            }
+//            if (msg.what == 0) {
+//                foreMask.startAnimation(entrance);
+//            } else if (msg.what == 1) {
+//                next();
+//            }
+            Intent intent = new Intent(SplashActivity.this, MainActivity_Design.class);
+            startActivity(intent);
+            finish();
+
         }
     };
 

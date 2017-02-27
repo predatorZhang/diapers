@@ -2,29 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF000000" >
+    android:background="#FF3e3d49" >
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo_hainiu"/>
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="17dp"
-        android:gravity="center_horizontal"
-        android:text="PowerBy 北京海牛科技有限公司"
-        android:textColor="@color/black"
-        android:textSize="9sp" />
+    <!--<TextView-->
+        <!--android:id="@+id/title"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginBottom="17dp"-->
+        <!--android:gravity="center_horizontal"-->
+        <!--android:text="PowerBy 北京海牛科技有限公司"-->
+        <!--android:textColor="@color/black"-->
+        <!--android:textSize="9sp" />-->
 
-    <View
-        android:id="@+id/foreMask"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white" />
+    <!--<View-->
+        <!--android:id="@+id/foreMask"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@color/white" />-->
 
    <!-- <View
         android:id="@+id/logo"
