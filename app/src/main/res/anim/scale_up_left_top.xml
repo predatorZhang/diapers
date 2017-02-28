@@ -11,7 +11,7 @@
         android:fromYScale="0.0"
         android:toYScale="1.0"
         android:pivotX="25%"
-        android:pivotY="25%"
+        android:pivotY="0%"
         android:fillAfter="false"
         android:duration="200"
         />
