@@ -404,9 +404,10 @@ public class MainActivity_Design extends BaseActivity {
                 transition = true;
                 v.setVisibility(View.INVISIBLE);
                 rl_middle.setVisibility(View.INVISIBLE);
-                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down);
+                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_right_top);
+                Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_left_bottom);
                 v.startAnimation(anim_1);
-                rl_middle.startAnimation(anim_1);
+                rl_middle.startAnimation(anim_tmp);
 
                 anim_1.setAnimationListener(new Animation.AnimationListener() {
                     @Override
@@ -440,7 +441,7 @@ public class MainActivity_Design extends BaseActivity {
                         GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
                         drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
 
-                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up);
+                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_right_top);
                         anim_2.setAnimationListener(new Animation.AnimationListener() {
                             @Override
                             public void onAnimationStart(Animation animation) {
@@ -461,7 +462,8 @@ public class MainActivity_Design extends BaseActivity {
                             }
                         });
                         rl_left.startAnimation(anim_2);
-                        rl_middle.startAnimation(anim_2);
+                        Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_left_bottom);
+                        rl_middle.startAnimation(anim_tmp);
 
                     }
 
@@ -483,9 +485,10 @@ public class MainActivity_Design extends BaseActivity {
                 transition = true;
                 v.setVisibility(View.INVISIBLE);
                 rl_middle.setVisibility(View.INVISIBLE);
-                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down);
+                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_left_top);
+                Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_right_bottom);
                 v.startAnimation(anim_1);
-                rl_middle.startAnimation(anim_1);
+                rl_middle.startAnimation(anim_tmp);
 
                 anim_1.setAnimationListener(new Animation.AnimationListener() {
                     @Override
@@ -519,7 +522,7 @@ public class MainActivity_Design extends BaseActivity {
                         GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
                         drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
 
-                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up);
+                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_left_top);
                         anim_2.setAnimationListener(new Animation.AnimationListener() {
                             @Override
                             public void onAnimationStart(Animation animation) {
@@ -540,7 +543,8 @@ public class MainActivity_Design extends BaseActivity {
                             }
                         });
                         rl_right.startAnimation(anim_2);
-                        rl_middle.startAnimation(anim_2);
+                        Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_right_bottom);
+                        rl_middle.startAnimation(anim_tmp);
 
                     }
 
