@@ -2,7 +2,7 @@
     <string name="app_name">AirDoc</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Search</string>
+    <string name="action_settings">扫描</string>
 
     <string name="app_versionName">3.1</string>
     <string name="app_versionCode">2</string>

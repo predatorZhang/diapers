@@ -137,7 +137,7 @@ public class DeviceListActivity extends BaseActivity {
 		registerReceiver(mUpdatePushReceiver, intentFilter);
 
 //        XGPushConfig.enableDebug(this, true);
-		// qq push
+		// qq push8
 		updateNotifyService();
 		pushInXiaomi();
 

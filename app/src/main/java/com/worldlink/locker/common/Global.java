@@ -21,10 +21,15 @@ import com.worldlink.locker.LockerApplication;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 
 public class Global {
 
@@ -35,6 +40,33 @@ public class Global {
     public static SimpleDateFormat NextWeekFormatTime = new SimpleDateFormat("下EEE");
     public static SimpleDateFormat LastWeekFormatTime = new SimpleDateFormat("上EEE");
 
+    public static String getLocalIpAddress()
+    {
+        String hostIp = null;
+        try {
+            Enumeration nis = NetworkInterface.getNetworkInterfaces();
+            InetAddress ia = null;
+            while (nis.hasMoreElements()) {
+                NetworkInterface ni = (NetworkInterface) nis.nextElement();
+                Enumeration<InetAddress> ias = ni.getInetAddresses();
+                while (ias.hasMoreElements()) {
+                    ia = ias.nextElement();
+                    if (ia instanceof Inet6Address) {
+                        continue;// skip ipv6
+                    }
+                    String ip = ia.getHostAddress();
+                    if (!"127.0.0.1".equals(ip)) {
+                        hostIp = ia.getHostAddress();
+                        break;
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            Log.i("yao", "SocketException");
+            e.printStackTrace();
+        }
+        return hostIp;
+    }
 
     // 通过文件头来判断是否gif
     public static boolean isGifByFile(File file) {

@@ -99,4 +99,13 @@ public class BleDeviceManager {
     public void setmConnIndex(int mConnIndex) {
         this.mConnIndex = mConnIndex;
     }
+
+    public void setmConnIndex(BleDeviceInfo bleDeviceInfo) {
+        for (int i = 0; i < mDeviceInfoList.size(); i++) {
+            if (bleDeviceInfo == mDeviceInfoList.get(i)) {
+                this.mConnIndex = i;
+            }
+        }
+
+    }
 }

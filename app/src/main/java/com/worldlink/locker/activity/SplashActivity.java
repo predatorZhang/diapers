@@ -17,12 +17,15 @@ import com.worldlink.locker.common.ImageLoadTool;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Fullscreen;
-import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.AnimationRes;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+
 @EActivity(R.layout.splash)
-@NoTitle
 @Fullscreen
 public class SplashActivity extends BaseActivity {
 
@@ -57,6 +60,24 @@ public class SplashActivity extends BaseActivity {
 
     @AfterViews
     void init() {
+       /* float fTemp;
+        try {
+            byte[] temp = {0x00, (byte)0x88, (byte)0xcb, (byte)0xbf};
+            DataInputStream dis = new DataInputStream(new
+                    ByteArrayInputStream(temp));
+             fTemp = dis.readFloat();
+
+            byte[] temp2 = {(byte)0x41, (byte)0xc6, (byte)0x2d, (byte)0x78};
+            DataInputStream dis2 = new DataInputStream(new
+                    ByteArrayInputStream(temp2));
+            float fTemp2 = dis2.readFloat();
+               BigDecimal b =new BigDecimal(fTemp2);
+            fTemp2 =b.setScale(1,BigDecimal.ROUND_HALF_UP).floatValue();
+
+            int a = 0;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
         ImageSize imageSize = new ImageSize(LockerApplication.sWidthPix, LockerApplication.sHeightPix);
         image.setImageBitmap(imageLoadTool.imageLoader.loadImageSync("drawable://" + R.drawable.logo_hainiu1, imageSize));
@@ -82,7 +103,7 @@ public class SplashActivity extends BaseActivity {
 
     void next() {
 
-        Intent intent = new Intent(this, DeviceListActivity_.class);
+        Intent intent = new Intent(this, MainActivity_.class);
         startActivity(intent);
         overridePendingTransition(R.anim.scroll_in, R.anim.scroll_out);
 

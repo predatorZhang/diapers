@@ -4,5 +4,5 @@
     android:innerRadius="90dp"
     >
 <solid
-    android:color="#FF0000"/>
+    android:color="#00FF00"/>
 </shape>

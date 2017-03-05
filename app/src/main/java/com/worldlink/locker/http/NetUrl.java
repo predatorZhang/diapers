@@ -11,6 +11,7 @@ public class NetUrl
 */
     public static String HOST="http://www.hainiutech.com:8080/iot/";
     public static String URL_UPDATE_APP;
+    public static String URL_HEFENG_WEATHER = "https://free-api.heweather.com/v5/weather";
 
     static {
         NetUrl.URL_UPDATE_APP = HOST+"rs/app/update/";
