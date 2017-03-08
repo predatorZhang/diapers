@@ -256,7 +256,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/rl_middle"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
 
         >
         <ImageButton
@@ -278,7 +278,7 @@
             android:text="21.6°C"
             android:layout_toLeftOf="@id/ib_ring"
             android:layout_centerVertical="true"
-            android:visibility="invisible"
+            android:visibility="gone"
         />
         <TextView
             android:id="@+id/tv_feel"
@@ -289,7 +289,7 @@
             android:text="--"
             android:layout_toRightOf="@id/ib_ring"
             android:layout_centerVertical="true"
-            android:visibility="invisible"
+            android:visibility="gone"
             />
 
     </RelativeLayout>
@@ -302,10 +302,89 @@
         android:scaleType="centerInside"
         android:background="#AAC0C0C0"
         android:visibility="invisible"/>
+
+    <!--weather-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_above="@+id/rl_index"
+        android:background="#77000000"
+        >
+        <ImageView
+            android:id="@+id/iv_weather"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_weather_sunny"
+            android:background="@drawable/circle8"/>
+        <LinearLayout
+            android:id="@+id/ll_weather_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_weather"
+            android:layout_alignTop="@id/iv_weather"
+            android:gravity="left|center">
+
+
+            <TextView android:id="@+id/tv_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="北京"
+                android:textColor="@android:color/white"
+                />
+            <TextView android:id="@+id/tv_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="空气质量:优"
+                android:textColor="@android:color/white"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/ll_weather_1"
+            android:layout_toRightOf="@id/iv_weather">
+            <TextView android:id="@+id/tv_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="温度:21.6°C"
+                android:textColor="@android:color/white"
+                />
+            <TextView android:id="@+id/tv_humid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="湿度:20%"
+                android:textColor="@android:color/white"
+                />
+            <TextView android:id="@+id/tv_pm25"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="PM2.5:125"
+                android:textColor="@android:color/white"
+                />
+            <TextView android:id="@+id/tv_pm10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="PM10:23"
+                android:textColor="@android:color/white"
+                />
+
+        </LinearLayout>
+    </RelativeLayout>
+
     <!-- index area-->
 <RelativeLayout
+    android:id="@id/rl_index"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="120dp"
     android:layout_alignParentBottom="true"
     android:background="#77000000"
     >

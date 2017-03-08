@@ -78,6 +78,7 @@ public class MainActivity_Design extends BaseActivity {
     //added by Stevens
 //    private SinkView sv_progress;
     private int[] bg_ids = {R.drawable.bg_1,R.drawable.bg_1_blur,R.drawable.bg_2, R.drawable.bg_2_blur, R.drawable.bg_3, R.drawable.bg_3_blur, R.drawable.bg_4, R.drawable.bg_4_blur, R.drawable.bg_5,R.drawable.bg_6,R.drawable.bg_7,R.drawable.bg_8,};
+    private int[] weather_ids = {R.drawable.ic_weather_04, R.drawable.ic_weather_clear, R.drawable.ic_weather_clear_cloudy, R.drawable.ic_weather_clear_rainy, R.drawable.ic_weather_clear_snowy, R.drawable.ic_weather_clear_storm, R.drawable.ic_weather_clear_windy, R.drawable.ic_weather_heavy_rain};
 //    private TextView tv_index;
 //    private ImageView iv_circle;
     private ImageView iv_background;
@@ -114,6 +115,8 @@ public class MainActivity_Design extends BaseActivity {
     private RelativeLayout rl_right;
     private ImageView iv_circle_right;
 
+    //weather report
+    private ImageView iv_weather;
 
     private Animation anim_1;
     private Animation anim_2;
@@ -556,6 +559,9 @@ public class MainActivity_Design extends BaseActivity {
                 });
             }
         });
+
+        iv_weather = (ImageView) findViewById(R.id.iv_weather);
+
 
         SharedPreferences prefs = getSharedPreferences("background", Context.MODE_PRIVATE);
         int index = prefs.getInt("bg_index", 0);
@@ -1204,6 +1210,10 @@ public class MainActivity_Design extends BaseActivity {
                 GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
                 drawable_right.setColor(Color.argb(255, 255 - value_random2%255 , value_random2%255, 0));
                 tv_index_right.setText(String.valueOf(value_random2%255));
+
+                int value_weather = Math.abs(r.nextInt());
+                int index = value_weather % weather_ids.length;
+                iv_weather.setImageResource(weather_ids[index]);
             }
 
 
