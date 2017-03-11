@@ -116,7 +116,7 @@ public class MainActivity_Design extends BaseActivity {
     private ImageView iv_circle_right;
 
     //weather report
-    private ImageView iv_weather;
+    private ImageButton ib_weather;
 
     private Animation anim_1;
     private Animation anim_2;
@@ -560,8 +560,13 @@ public class MainActivity_Design extends BaseActivity {
             }
         });
 
-        iv_weather = (ImageView) findViewById(R.id.iv_weather);
-
+        ib_weather = (ImageButton) findViewById(R.id.ib_weather);
+        ib_weather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSearchRequested();
+            }
+        });
 
         SharedPreferences prefs = getSharedPreferences("background", Context.MODE_PRIVATE);
         int index = prefs.getInt("bg_index", 0);
@@ -695,6 +700,11 @@ public class MainActivity_Design extends BaseActivity {
             unbindService(mServiceConnection);
             mBluetoothLeService = null;
         }
+    }
+
+    @Override
+    public boolean onSearchRequested() {
+        return super.onSearchRequested();
     }
 
     /**
@@ -1213,7 +1223,7 @@ public class MainActivity_Design extends BaseActivity {
 
                 int value_weather = Math.abs(r.nextInt());
                 int index = value_weather % weather_ids.length;
-                iv_weather.setImageResource(weather_ids[index]);
+                ib_weather.setImageResource(weather_ids[index]);
             }
 
 

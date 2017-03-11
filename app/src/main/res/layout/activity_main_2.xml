@@ -310,20 +310,21 @@
         android:layout_above="@+id/rl_index"
         android:background="#77000000"
         >
-        <ImageView
-            android:id="@+id/iv_weather"
+        <ImageButton
+            android:id="@+id/ib_weather"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_weather_sunny"
-            android:background="@drawable/circle8"/>
+            android:background="@drawable/circle8"
+            android:scaleType="fitCenter"/>
         <LinearLayout
             android:id="@+id/ll_weather_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/iv_weather"
-            android:layout_alignTop="@id/iv_weather"
+            android:layout_toRightOf="@id/ib_weather"
+            android:layout_alignTop="@id/ib_weather"
             android:gravity="left|center">
 
 
@@ -347,7 +348,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_below="@id/ll_weather_1"
-            android:layout_toRightOf="@id/iv_weather">
+            android:layout_toRightOf="@id/ib_weather">
             <TextView android:id="@+id/tv_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
