@@ -13,6 +13,14 @@
         <item>实验室</item>
         <item>公司</item>
     </string-array>
+
+    <string-array name="array_city">
+        <item>北京</item>
+        <item>上海</item>
+        <item>广州</item>
+        <item>深圳</item>
+
+    </string-array>
     <string name="ble_not_supported">该设备不支持蓝牙4.0</string>
     <string name="bt_not_supported">不支持蓝牙</string>
     <string name="bt_on">蓝牙设备已开启</string>
@@ -21,6 +29,8 @@
 
 
     <string-array name="device_filter"><item>BLE_REMOTE</item></string-array>
+
+    <string name="actionbar_citylist">城市列表</string>
 <!--
     <string-array name="device_filter"><item>SensorTag</item></string-array>
 -->
