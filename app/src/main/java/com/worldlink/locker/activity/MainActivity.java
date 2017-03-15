@@ -16,10 +16,8 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -35,6 +33,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
 import com.daasuu.bl.BubblePopupHelper;
@@ -52,10 +54,10 @@ import com.worldlink.locker.common.WeatherList;
 import com.worldlink.locker.http.ApiClent;
 import com.worldlink.locker.services.BluetoothLeService;
 import com.worldlink.locker.services.Sensor;
-import com.worldlink.locker.services.SensorTag;
+import com.zaaach.citypicker.CityPickerActivity;
+import com.zaaach.citypicker.utils.StringUtils;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
@@ -63,7 +65,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -185,14 +186,13 @@ public class MainActivity extends BaseActivity {
     private List<BluetoothGattService> mServiceList = new ArrayList<BluetoothGattService>();
     private static final int GATT_TIMEOUT = 100; // milliseconds
     private List<Sensor> mEnabledSensors = new ArrayList<Sensor>();
-/*
-    private BluetoothLeService mBluetoothLeService = BluetoothLeService.getInstance();
-*/
 
     private PopupWindow weatherPopupWindow;
     private PopupWindow pm25PopupWindow;
     private String ipAddr;
     private ImageLoadTool imageLoadTool = new ImageLoadTool();
+
+    private static final int REQUEST_CODE_PICK_CITY = 0;
 
     private ApiClent.ClientCallback netIpCallback = new ApiClent.ClientCallback() {
         @Override
@@ -281,27 +281,25 @@ public class MainActivity extends BaseActivity {
                                   String pm25,String pm10,
                                   String qual,
                                   String time) {
-        TextView tvWetrCity = (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_city);
-        ImageView tvWetrCode =(ImageView) this.weatherPopupWindow.getContentView().findViewById(R.id.iv_wetr_code);
-        TextView tvWetrTemp= (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_temp);
-        TextView tvWetrHumi= (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_humi);
-        TextView tvWetrPM25 = (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_pm25);
-        TextView tvWetrPm10 = (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_pm10);
-        TextView tvWetrAq = (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_aq);
-        TextView tvWetrTime = (TextView)this.weatherPopupWindow.getContentView().findViewById(R.id.tv_wetr_time);
+
+        TextView tvWetrCity = (TextView)this.findViewById(R.id.wetrtv_city);
+        TextView tvWetrAq = (TextView)this.findViewById(R.id.wetrtv_quality);
+        TextView tvWetrTemp= (TextView)this.findViewById(R.id.wetr_tv_temp);
+        TextView tvWetrHumi= (TextView)this.findViewById(R.id.wetr_tv_humid);
+        TextView tvWetrPM25 = (TextView)this.findViewById(R.id.wetr_tv_pm25);
+        TextView tvWetrPm10 = (TextView)this.findViewById(R.id.wetr_tv_pm10);
+
+        TextView tvWetrTime = (TextView)this.findViewById(R.id.wetrtv_time);
 
         tvWetrCity.setText(city);
-        imageLoadTool.loadImage(tvWetrCode, "http://files.heweather.com/cond_icon/"
-                + code + ".png", (DisplayImageOptions)null);
         imageLoadTool.loadImage(this.ib_weather, "http://files.heweather.com/cond_icon/"
                 + code + ".png", (DisplayImageOptions) null);
-        tvWetrHumi.setText("湿度: " + humi + "%");
-        tvWetrTemp.setText("温度："+temp+"°C");
+        tvWetrHumi.setText("湿度:" + humi + "%");
+        tvWetrTemp.setText("温度:"+temp+"°C");
         tvWetrPM25.setText("PM2.5: "+pm25);
-        tvWetrPm10.setText("pm10: "+pm10);
-        tvWetrAq.setText("空气指数:"+qual);
+        tvWetrPm10.setText("pm10:"+pm10);
+        tvWetrAq.setText("空气质量:"+qual);
         tvWetrTime.setText(time);
-
     }
 
 
@@ -309,7 +307,9 @@ public class MainActivity extends BaseActivity {
     private Animation anim_2;
     private boolean transition = false;
 
+/*
     @Click
+*/
     public void rl_left() {
         if(transition){
             //animation hasn't finished
@@ -391,7 +391,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+/*
     @Click
+*/
     public void rl_right() {
         if(transition){
             //animation hasn't finished
@@ -526,29 +528,34 @@ public class MainActivity extends BaseActivity {
         startUpdateService();
 
         //=============================================================
-
+        //获取网络ip
+/*
         ApiClent.getNetIp(this, netIpCallback);
+*/
+        startPostion();
 
         iv_circle_middle.setBackgroundResource(R.drawable.circle5);
         iv_circle_left.setBackgroundResource(R.drawable.circle5);
         iv_circle_right.setBackgroundResource(R.drawable.circle5);
 
         iv_background.setImageResource(bg_ids[2]);
-        this.showResult((float) 25.5, (float) 20.0, (float) 1, (float) 0, (float) 100,
-                (float) 0.01, (float) 2);
+      /*  this.showResult((float) 25.5, (float) 20.0, (float) 1, (float) 0, (float) 100,
+                (float) 0.01, (float) 2);*/
         final BubbleLayout bubbleLayout = (BubbleLayout) LayoutInflater.from(this).
                 inflate(R.layout.layout_weather_bubble, null);
         weatherPopupWindow = BubblePopupHelper.create(this, bubbleLayout);
         ib_weather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int[] location = new int[2];
+                startActivityForResult(new Intent(MainActivity.this, CityPickerActivity.class),
+                        REQUEST_CODE_PICK_CITY);
+             /*   int[] location = new int[2];
                 v.getLocationInWindow(location);
                 if (ipAddr != null) {
                     ApiClent.getWeather(MainActivity.this, ipAddr, weatherCallback);
                 }
                 bubbleLayout.setArrowDirection(ArrowDirection.TOP);
-                weatherPopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, location[0], v.getHeight() + location[1]);
+                weatherPopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, location[0], v.getHeight() + location[1]);*/
             }
         });
 
@@ -589,6 +596,46 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+    }
+
+    private AMapLocationClient mLocationClient;
+
+    private void startPostion() {
+        this.mLocationClient = new AMapLocationClient(this);
+        AMapLocationClientOption option = new AMapLocationClientOption();
+        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        option.setOnceLocation(true);
+        this.mLocationClient.setLocationOption(option);
+        this.mLocationClient.setLocationListener(new AMapLocationListener() {
+            public void onLocationChanged(AMapLocation aMapLocation) {
+                if (aMapLocation != null) {
+                    if (aMapLocation.getErrorCode() == 0) {
+                        String city = aMapLocation.getCity();
+                        String district = aMapLocation.getDistrict();
+                        String location = StringUtils.extractLocation(city, district);
+                        ApiClent.getWeather(MainActivity.this, city, weatherCallback);
+//                        CityPickerActivity.this.mCityAdapter.updateLocateState(888, location);
+                    } else {
+//                        CityPickerActivity.this.mCityAdapter.updateLocateState(666, (String) null);
+                    }
+                }
+
+            }
+        });
+        this.mLocationClient.startLocation();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_PICK_CITY && resultCode == RESULT_OK){
+            if (data != null){
+                String city = data.getStringExtra(CityPickerActivity.KEY_PICKED_CITY);
+                ApiClent.getWeather(MainActivity.this, city, weatherCallback);
+
+/*
+                resultTV.setText("当前选择：" + city);
+*/
+            }
+        }
     }
 
     private void startUpdateService() {
@@ -850,6 +897,9 @@ public class MainActivity extends BaseActivity {
                 mBluetoothLeService.close();
                 ib_device.setImageResource(R.drawable.dv_disconneted);
                 Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
+                mServicesRdy = false;
+                mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
+
 /*
                 startScan();//重新扫描设备
 */
@@ -930,62 +980,15 @@ public class MainActivity extends BaseActivity {
 
         // Characteristics descriptor readout done
         if (mServicesRdy) {
-/*
-			setStatus("Service discovery complete");s
-*/
-            //TODO LIST：初始化后，扫描到服务
-            enableSensors(true);
-            enableNotifications(true);
-          // enableNotificationForLock(true);
-         //   enableNotificationForAir(true);
+            enableNotificationForAir(true);
             ib_device.setImageResource(R.drawable.dv_connected);
-          Toast.makeText(getApplication(), "设备已连接", Toast.LENGTH_LONG).show();
-
+           Toast.makeText(getApplication(), "设备已连接", Toast.LENGTH_LONG).show();
         }
         else {
 /*
             setError("Failed to read services");
 */
         }
-    }
-
-    private void enableNotifications(boolean enable) {
-        for (Sensor sensor : mEnabledSensors) {
-            //TODO LIST：data也是一个单独的characteristic
-            UUID servUuid = sensor.getService();
-            UUID dataUuid = sensor.getData();
-            BluetoothGattService serv = mBtGatt.getService(servUuid);
-            BluetoothGattCharacteristic charac = serv.getCharacteristic(dataUuid);
-
-            mBluetoothLeService.setCharacteristicNotification(charac, enable);
-            mBluetoothLeService.waitIdle(GATT_TIMEOUT);
-        }
-    }
-
-    private void enableSensors(boolean enable) {
-        for (Sensor sensor : mEnabledSensors) {
-            UUID servUuid = sensor.getService();
-            UUID confUuid = sensor.getConfig();
-
-            // Skip keys
-            if (confUuid == null)
-                break;
-
-            // Barometer calibration
-            if (confUuid.equals(SensorTag.UUID_BAR_CONF) && enable) {
-              //  calibrateBarometer();
-            }
-
-            BluetoothGattService serv = mBtGatt.getService(servUuid);
-            BluetoothGattCharacteristic charac = serv.getCharacteristic(confUuid);
-
-            //TODO LIST：除了Gyroscope：0：disable，7 enable，其余的均是0disable 1 enable
-            byte value =  enable ? sensor.getEnableSensorCode() : Sensor.DISABLE_SENSOR_CODE;
-            mBluetoothLeService.writeCharacteristic(charac, value);
-            mBluetoothLeService.waitIdle(GATT_TIMEOUT);
-
-        }
-
     }
 
     private void enableNotificationForAir(boolean enable) {
@@ -1017,33 +1020,6 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void enableNotificationForLock(boolean enable) {
-
-        UUID RX_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
-        BluetoothGattService RxService = mBtGatt.getService(RX_SERVICE_UUID);
-        if (RxService == null) {
-            return;
-        }
-
-
-        UUID TX_CHAR_UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
-        BluetoothGattCharacteristic TxChar = RxService.getCharacteristic(TX_CHAR_UUID);
-        if (TxChar == null) {
-            return;
-        }
-
-        mBtGatt.setCharacteristicNotification(TxChar,true);
-
-        UUID CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-        BluetoothGattDescriptor descriptor = TxChar.getDescriptor(CCCD);
-        if (descriptor == null) {
-            return;
-        }
-        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        mBtGatt.writeDescriptor(descriptor);
-
-    }
-
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1059,9 +1035,7 @@ public class MainActivity extends BaseActivity {
                     return;
                 }
             } else if (BluetoothLeService.ACTION_DATA_NOTIFY.equals(action)) {
-                // Notification
-                // char[] dd = intent.getCharArrayExtra(BluetoothLeService.EXTRA_DATA);
-               // short[] ds = intent.getShortArrayExtra(BluetoothLeService.EXTRA_DATA);
+
                 final byte[] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 String uuidStr = intent.getStringExtra(BluetoothLeService.EXTRA_UUID);
                 //TODO LIST:注销当前的值
@@ -1088,7 +1062,7 @@ public class MainActivity extends BaseActivity {
     };
 
     private void onCharacteristicWrite(String uuidStr, int status) {
-        Log.d(TAG,"onCharacteristicWrite: " + uuidStr);
+        Log.d(TAG, "onCharacteristicWrite: " + uuidStr);
     }
 
     private void onCharacteristicChanged(String uuidStr, final byte[] value) {
@@ -1096,9 +1070,6 @@ public class MainActivity extends BaseActivity {
         this.runOnUiThread(new Runnable() {
             public void run() {
                 try {
-/*
-                    byte temp = value[1];
-*/
                     byte[] temp = {value[4], value[3], value[2], value[1]};
                     DataInputStream dis = new DataInputStream(new
                             ByteArrayInputStream(temp));
@@ -1277,85 +1248,5 @@ public class MainActivity extends BaseActivity {
         fi.addAction(BluetoothLeService.ACTION_DATA_READ);
         return fi;
     }
-
-    private boolean sendMsg(String message) {
-        byte[] value;
-        try {
-            //send data to service
-            value = message.getBytes("UTF-8");
-            //TODO LIST: define the service uuid
-            UUID RX_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
-            BluetoothGattService RxService = mBtGatt.getService(RX_SERVICE_UUID);
-            if (RxService == null) {
-                return false;
-            }
-            //TODO LIST: define the characteristics uuid
-            UUID RX_CHAR_UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
-            BluetoothGattCharacteristic RxChar = RxService.getCharacteristic(RX_CHAR_UUID);
-            if (RxChar == null) {
-                return false;
-            }
-            RxChar.setValue(value);
-            boolean status = mBtGatt.writeCharacteristic(RxChar);
-            return status;
-
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
-
-    /***
-     * added by Stevens
-     *
-     * used for demo purose only
-     */
-    private class ProgressDemoTask extends AsyncTask<Void, Integer, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            for (int i = 0; i <= 255; i++) {
-                publishProgress(Integer.valueOf(i));
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            int progress = values[0];
-//            sv_progress.setPercent(progress / (float) 100);
-            int value = progress;//(int) (progress / (float) 100 * 255.0f);
-            int offset = 255 - value;
-            GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
-            drawable.setColor(Color.argb(255, offset, value, 0));
-            tv_index_middle.setText(String.valueOf(value));
-            if( progress <= 20 ){
-                tv_feel.setText("干爽");
-            }
-            else if(progress > 20 && progress <= 60){
-                tv_feel.setText("舒适");
-            }else if(progress > 60 && progress <= 100) {
-                tv_feel.setText("潮湿");
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-//            iv_emotion.setVisibility(View.VISIBLE);
-
-        }
-    }//end of ProgressDemoTask
-
-
 
 }//end of file

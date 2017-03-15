@@ -18,7 +18,7 @@ public class BleDeviceManager {
     private List<BleDeviceInfo> mDeviceInfoList = new ArrayList<>();
 
     //TODO LIST：初始化从string.xml中获得过滤列表
-    private String[] mDeviceFilter = null;
+    private String[] mDeviceFilter;
 
     public static final int NO_DEVICE = -1;
 
@@ -35,6 +35,9 @@ public class BleDeviceManager {
     }
 
     private boolean checkDeviceFilter(BluetoothDevice device) {
+        if (device == null) {
+            return false;
+        }
         int n = mDeviceFilter.length;
         if (n > 0) {
             boolean found = false;
@@ -58,7 +61,7 @@ public class BleDeviceManager {
 
     public void updateOrAdd(BluetoothDevice device, int rssi) {
 
-      //  if (checkDeviceFilter(device)) {
+        if (checkDeviceFilter(device)) {
             if (!deviceInfoExists(device.getAddress())) {
                 BleDeviceInfo dev = new BleDeviceInfo(device, rssi);
                 mDeviceInfoList.add(dev);
@@ -67,7 +70,7 @@ public class BleDeviceManager {
                 deviceInfo.updateRssi(rssi);
             }
 
-      //  }
+        }
 
     }
 

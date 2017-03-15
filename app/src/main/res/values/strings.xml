@@ -19,7 +19,7 @@
     <string name="title_activity_update_tip">UpdateTipActivity</string>
 
 
-    <string-array name="device_filter"><item>BLE_REMOTE</item></string-array>
+    <string-array name="device_filter"><item>HN_PM2.5_CH2O</item></string-array>
 <!--
     <string-array name="device_filter"><item>SensorTag</item></string-array>
 -->

@@ -38,6 +38,7 @@ dependencies {
     compile project(':library:WheelPicker')
     compile project(':library:Common')
     compile files('libs/mid-sdk-2.20.jar')
+    compile 'com.zaaach:citypicker:1.1'
 
 
 }
@@ -45,10 +46,13 @@ dependencies {
 //
 buildscript {
     repositories {
+        jcenter()
+/*
         mavenCentral()
+*/
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:2.0.0-alpha2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }

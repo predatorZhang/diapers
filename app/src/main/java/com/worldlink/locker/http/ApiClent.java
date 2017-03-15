@@ -41,12 +41,12 @@ public class ApiClent {
     }
 
     //TODO LIST：服务器端API开发
-    public static void getWeather(Context appContext, String ip,final ClientCallback callback) {
+    public static void getWeather(Context appContext, String city,final ClientCallback callback) {
 
         Ion.with(appContext)
                 .load(NetUrl.URL_HEFENG_WEATHER)
                 .setBodyParameter("key", heFengApiKey)
-                .setBodyParameter("city", ip)
+                .setBodyParameter("city", city)
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override
