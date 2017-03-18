@@ -1,23 +1,13 @@
 package com.worldlink.locker.activity;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,6 +27,10 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.clj.fastble.BleManager;
+import com.clj.fastble.conn.BleCharacterCallback;
+import com.clj.fastble.conn.BleGattCallback;
+import com.clj.fastble.exception.BleException;
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
 import com.daasuu.bl.BubblePopupHelper;
@@ -45,32 +39,20 @@ import com.tencent.android.tpush.XGPushManager;
 import com.tencent.android.tpush.service.XGPushService;
 import com.worldlink.locker.R;
 import com.worldlink.locker.UpdateService;
-import com.worldlink.locker.common.BleDeviceInfo;
-import com.worldlink.locker.common.BleDeviceManager;
-import com.worldlink.locker.common.DevicePicker;
 import com.worldlink.locker.common.HeWeather5Bean;
 import com.worldlink.locker.common.ImageLoadTool;
 import com.worldlink.locker.common.WeatherList;
 import com.worldlink.locker.http.ApiClent;
-import com.worldlink.locker.services.BluetoothLeService;
-import com.worldlink.locker.services.Sensor;
 import com.zaaach.citypicker.CityPickerActivity;
 import com.zaaach.citypicker.utils.StringUtils;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import cn.qqtheme.framework.picker.OptionPicker;
 
 
 @EActivity(R.layout.activity_main)
@@ -165,75 +147,13 @@ public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
 
-    //蓝牙相关操作
-    private BluetoothLeService mBluetoothLeService = null;
-    private volatile boolean mScanning = false;
-    private BluetoothAdapter mBtAdapter = null;
-    private boolean mInitialised = false;
-    private IntentFilter mFilter;
-    private boolean mBleSupported = true;
-    private static BluetoothManager mBluetoothManager;
-    private BleDeviceManager bleDeviceManager;
-    private BluetoothDevice mBluetoothDevice = null;
-    private static final int REQ_ENABLE_BT = 0;
-    private boolean isConnected = false;
-
-
-    //建立连接后
-    private BluetoothGatt mBtGatt = null;
-    private boolean mIsReceiving = false;
-    private boolean mServicesRdy = false;
-    private List<BluetoothGattService> mServiceList = new ArrayList<BluetoothGattService>();
-    private static final int GATT_TIMEOUT = 100; // milliseconds
-    private List<Sensor> mEnabledSensors = new ArrayList<Sensor>();
 
     private PopupWindow weatherPopupWindow;
     private PopupWindow pm25PopupWindow;
-    private String ipAddr;
     private ImageLoadTool imageLoadTool = new ImageLoadTool();
 
     private static final int REQUEST_CODE_PICK_CITY = 0;
 
-    private ApiClent.ClientCallback netIpCallback = new ApiClent.ClientCallback() {
-        @Override
-        public void onSuccess(Object data) {
-
-            try {
-                String sData = data.toString();
-                // 从反馈的结果中提取出IP地址
-                int start = sData.indexOf("{");
-                int end = sData.indexOf("}");
-                String json = sData.substring(start, end + 1);
-                if (json != null) {
-                    try {
-                        JSONObject jsonObject = new JSONObject(json);
-                        ipAddr = jsonObject.optString("cip");
-                        ApiClent.getWeather(MainActivity.this,ipAddr,
-                                MainActivity.this.weatherCallback);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                //todo list:更新界面内容
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onFailure(String message) {
-
-        }
-
-        @Override
-        public void onError(Exception e) {
-            Log.d(TAG, "" + e);
-            showProgressBar(false);
-            showMiddleToast("服务器连接失败");
-
-        }
-    };
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
         public void onSuccess(Object data) {
@@ -251,8 +171,8 @@ public class MainActivity extends BaseActivity {
                     String hum = heWeather5.getNow().getHum();
                     String qlt = heWeather5.getAqi().getCity().getQlty();
                     String time = heWeather5.getBasic().getUpdate().getLoc();
-                    MainActivity.this.updateCurWeather(city,code,tmp,
-                            hum,pm25,pm10,qlt,time);
+                    MainActivity.this.updateCurWeather(city, code, tmp,
+                            hum, pm25, pm10, qlt, time);
                 }
 
                 //todo list:更新界面内容
@@ -271,34 +191,33 @@ public class MainActivity extends BaseActivity {
             Log.d(TAG, "" + e);
             showProgressBar(false);
             showMiddleToast("服务器连接失败");
-
         }
     };
 
 
-    private void updateCurWeather(String city,String code,
+    private void updateCurWeather(String city, String code,
                                   String temp, String humi,
-                                  String pm25,String pm10,
+                                  String pm25, String pm10,
                                   String qual,
                                   String time) {
 
-        TextView tvWetrCity = (TextView)this.findViewById(R.id.wetrtv_city);
-        TextView tvWetrAq = (TextView)this.findViewById(R.id.wetrtv_quality);
-        TextView tvWetrTemp= (TextView)this.findViewById(R.id.wetr_tv_temp);
-        TextView tvWetrHumi= (TextView)this.findViewById(R.id.wetr_tv_humid);
-        TextView tvWetrPM25 = (TextView)this.findViewById(R.id.wetr_tv_pm25);
-        TextView tvWetrPm10 = (TextView)this.findViewById(R.id.wetr_tv_pm10);
+        TextView tvWetrCity = (TextView) this.findViewById(R.id.wetrtv_city);
+        TextView tvWetrAq = (TextView) this.findViewById(R.id.wetrtv_quality);
+        TextView tvWetrTemp = (TextView) this.findViewById(R.id.wetr_tv_temp);
+        TextView tvWetrHumi = (TextView) this.findViewById(R.id.wetr_tv_humid);
+        TextView tvWetrPM25 = (TextView) this.findViewById(R.id.wetr_tv_pm25);
+        TextView tvWetrPm10 = (TextView) this.findViewById(R.id.wetr_tv_pm10);
 
-        TextView tvWetrTime = (TextView)this.findViewById(R.id.wetrtv_time);
+        TextView tvWetrTime = (TextView) this.findViewById(R.id.wetrtv_time);
 
         tvWetrCity.setText(city);
         imageLoadTool.loadImage(this.ib_weather, "http://files.heweather.com/cond_icon/"
                 + code + ".png", (DisplayImageOptions) null);
         tvWetrHumi.setText("湿度:" + humi + "%");
-        tvWetrTemp.setText("温度:"+temp+"°C");
-        tvWetrPM25.setText("PM2.5: "+pm25);
-        tvWetrPm10.setText("pm10:"+pm10);
-        tvWetrAq.setText("空气质量:"+qual);
+        tvWetrTemp.setText("温度:" + temp + "°C");
+        tvWetrPM25.setText("PM2.5: " + pm25);
+        tvWetrPm10.setText("pm10:" + pm10);
+        tvWetrAq.setText("空气质量:" + qual);
         tvWetrTime.setText(time);
     }
 
@@ -307,11 +226,11 @@ public class MainActivity extends BaseActivity {
     private Animation anim_2;
     private boolean transition = false;
 
-/*
-    @Click
-*/
+    /*
+        @Click
+    */
     public void rl_left() {
-        if(transition){
+        if (transition) {
             //animation hasn't finished
             return;
         }
@@ -391,11 +310,11 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-/*
-    @Click
-*/
+    /*
+        @Click
+    */
     public void rl_right() {
-        if(transition){
+        if (transition) {
             //animation hasn't finished
             return;
         }
@@ -480,58 +399,34 @@ public class MainActivity extends BaseActivity {
         context.startService(service);
     }
 
-    DevicePicker devicePicker;
+    public BleManager bleManager;
+    public final String DEVICE_NAME = "HN_PM2.5_CH2O";
+    public final String UUID_SERVICE = "0000fff1-0000-1000-8000-00805f9b34fb";
+    public final String UUID_NOTIFY = "0000fffa-0000-1000-8000-00805f9b34fb";
+
+    public boolean mBleSupported = false;
 
     @AfterViews
     public void init() {
 
-        //TODO LIST：初始化蓝牙功能
-        bleDeviceManager = new BleDeviceManager(this);
-        //判断蓝牙设备是否可用
+        bleManager = new BleManager(this);
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_LONG).show();
             mBleSupported = false;
         }
-
-        // Initializes a Bluetooth adapter. For API level 18 and above, get a
-        // reference to BluetoothAdapter through BluetoothManager.
-        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBtAdapter = mBluetoothManager.getAdapter();
-
-        // Checks if Bluetooth is supported on the device.
-        if (mBtAdapter == null) {
+        if (!bleManager.isSupportBle()) {
             Toast.makeText(this, R.string.bt_not_supported, Toast.LENGTH_LONG).show();
             mBleSupported = false;
         }
+        bleManager.enableBluetooth();
+        startScan();
 
-        mFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        mFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        mFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-
-        if (!mInitialised) {
-            // Broadcast receiver
-            registerReceiver(mReceiver, mFilter);
-            if (mBtAdapter.isEnabled()) {
-                startBluetoothLeService();
-            } else {
-                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableIntent, REQ_ENABLE_BT);
-            }
-            mInitialised = true;
-        } else {
-            ib_device.setImageResource(R.drawable.dv_disconneted);
-        }
         ib_device.setImageResource(R.drawable.dv_disconneted);
         XGPushManager.registerPush(this, "*");
         updateNotifyService();
         pushInXiaomi();
         startUpdateService();
 
-        //=============================================================
-        //获取网络ip
-/*
-        ApiClent.getNetIp(this, netIpCallback);
-*/
         startPostion();
 
         iv_circle_middle.setBackgroundResource(R.drawable.circle5);
@@ -539,8 +434,6 @@ public class MainActivity extends BaseActivity {
         iv_circle_right.setBackgroundResource(R.drawable.circle5);
 
         iv_background.setImageResource(bg_ids[2]);
-      /*  this.showResult((float) 25.5, (float) 20.0, (float) 1, (float) 0, (float) 100,
-                (float) 0.01, (float) 2);*/
         final BubbleLayout bubbleLayout = (BubbleLayout) LayoutInflater.from(this).
                 inflate(R.layout.layout_weather_bubble, null);
         weatherPopupWindow = BubblePopupHelper.create(this, bubbleLayout);
@@ -549,13 +442,6 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 startActivityForResult(new Intent(MainActivity.this, CityPickerActivity.class),
                         REQUEST_CODE_PICK_CITY);
-             /*   int[] location = new int[2];
-                v.getLocationInWindow(location);
-                if (ipAddr != null) {
-                    ApiClent.getWeather(MainActivity.this, ipAddr, weatherCallback);
-                }
-                bubbleLayout.setArrowDirection(ArrowDirection.TOP);
-                weatherPopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, location[0], v.getHeight() + location[1]);*/
             }
         });
 
@@ -569,30 +455,6 @@ public class MainActivity extends BaseActivity {
                 v.getLocationInWindow(location);
                 bubbleLayout.setArrowDirection(ArrowDirection.RIGHT);
                 pm25PopupWindow.showAtLocation(v, Gravity.NO_GRAVITY, location[0], v.getHeight() + location[1]);
-            }
-        });
-
-        //初始化设备列表
-        devicePicker = new DevicePicker(this);
-        devicePicker.setAnimationStyle(R.style.Animation_CustomPopup);
-        devicePicker.setOffset(1);//偏移量
-        devicePicker.setTitleText("设备列表");
-        devicePicker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
-            @Override
-            public void onOptionPicked(String option) {
-
-                BleDeviceInfo bleDeviceInfo = devicePicker.getBluetoothDeviceByAddr(option);
-                if (mScanning)
-                    stopScan();
-                mBluetoothDevice = bleDeviceInfo.getBluetoothDevice();
-                if (bleDeviceManager.getmConnIndex() == BleDeviceManager.NO_DEVICE) {
-                    bleDeviceManager.setmConnIndex(bleDeviceInfo);
-                    onConnect();
-                } else {
-                    if (bleDeviceManager.getmConnIndex() != BleDeviceManager.NO_DEVICE) {
-                        mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
-                    }
-                }
             }
         });
 
@@ -614,7 +476,6 @@ public class MainActivity extends BaseActivity {
                         String district = aMapLocation.getDistrict();
                         String location = StringUtils.extractLocation(city, district);
                         ApiClent.getWeather(MainActivity.this, city, weatherCallback);
-//                        CityPickerActivity.this.mCityAdapter.updateLocateState(888, location);
                     } else {
 //                        CityPickerActivity.this.mCityAdapter.updateLocateState(666, (String) null);
                     }
@@ -624,16 +485,13 @@ public class MainActivity extends BaseActivity {
         });
         this.mLocationClient.startLocation();
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_CITY && resultCode == RESULT_OK){
-            if (data != null){
+        if (requestCode == REQUEST_CODE_PICK_CITY && resultCode == RESULT_OK) {
+            if (data != null) {
                 String city = data.getStringExtra(CityPickerActivity.KEY_PICKED_CITY);
                 ApiClent.getWeather(MainActivity.this, city, weatherCallback);
-
-/*
-                resultTV.setText("当前选择：" + city);
-*/
             }
         }
     }
@@ -655,27 +513,15 @@ public class MainActivity extends BaseActivity {
             XGPushManager.registerPush(this, "*");
         }
     }
+
     @Override
     public void onResume() {
 
         // TODO Auto-generated method stub
-        Log.d(TAG, "onResume");
-        if (!mIsReceiving) {
-            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-            mIsReceiving = true;
-        }
         super.onResume();
     }
 
-    @Override
-    public void onPause() {
-        Log.d(TAG, "onPause");
-        super.onPause();
-        if (mIsReceiving) {
-            unregisterReceiver(mGattUpdateReceiver);
-            mIsReceiving = false;
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -700,369 +546,96 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    private void startScan() {
+        if (!bleManager.isConnectingOrConnected()) {
+        bleManager.scanNameAndConnect(
+                DEVICE_NAME,
+                10000,
+                false,
+                new BleGattCallback() {
+                    @Override
+                    public void onNotFoundDevice() {
+                        Log.i(TAG, "未发现设备！");
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ib_device.setImageResource(R.drawable.dv_disconneted);
+                                Toast.makeText(MainActivity.this.getApplication(), "未找到甲醛检测仪", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onConnectSuccess(final BluetoothGatt gatt, int status) {
+                        Log.i(TAG, "连接成功！");
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                gatt.discoverServices();
+                                Toast.makeText(MainActivity.this.getApplication(), "设备连接已连接", Toast.LENGTH_LONG).show();
+                                ib_device.setImageResource(R.drawable.dv_connected);
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                        Log.i(TAG, "服务被发现！");
+                        bleManager.getBluetoothState();
+
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                try {
+                                    bleManager.notify(
+                                            UUID_SERVICE,
+                                            UUID_NOTIFY,
+                                            new BleCharacterCallback() {
+                                                @Override
+                                                public void onSuccess(BluetoothGattCharacteristic characteristic) {
+                                                    MainActivity.this.onCharacteristicChanged("", characteristic.getValue());
+                                                }
+
+                                                @Override
+                                                public void onFailure(BleException exception) {
+                                                    bleManager.handleException(exception);
+                                                }
+                                            });
+                                } catch (Exception e) {
+                                    Log.e(TAG, e.getMessage());
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                        super.onConnectionStateChange(gatt, status, newState);
+                    }
+
+                    @Override
+                    public void onConnectFailure(BleException exception) {
+                        Log.i(TAG, "连接失败或连接中断：" + exception.toString());
+                        Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
+                        bleManager.handleException(exception);
+                        ib_device.setImageResource(R.drawable.dv_disconneted);
+                    }
+
+                }
+        );
+        }
+    }
+
+
     @Override
     public void onDestroy() {
         Log.d(TAG, "Destroy");
-
-        //注销数据监听listenner
-        if (mIsReceiving) {
-            unregisterReceiver(mGattUpdateReceiver);
-            mIsReceiving = false;
-        }
-
-        if (mBluetoothDevice!=null && mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT) ==
-                BluetoothGatt.STATE_CONNECTED) {
-            mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
-        }
-
-        //注销蓝牙服务
-        if (mBluetoothLeService != null) {
-            scanLeDevice(false);
-            mBluetoothLeService.close();
-            unregisterReceiver(mReceiver);
-            unbindService(mServiceConnection);
-            mBluetoothLeService = null;
-        }
+        bleManager.stopNotify(UUID_SERVICE, UUID_NOTIFY);
+        bleManager.closeBluetoothGatt();
+        bleManager = null;
         super.onDestroy();
-    }
-
-/**
- * =========================bluetoth operation------------------------------
- */
-
-    /**
-     * 开启蓝牙服务
-     */
-    private void startBluetoothLeService() {
-
-        boolean f;
-        Intent bindIntent = new Intent(this, BluetoothLeService.class);
-        startService(bindIntent);
-        f = bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        if (f)
-            Log.d(TAG, "BluetoothLeService - success");
-        else {
-            Toast.makeText(MainActivity.this, "BluetoothLeService-falied", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
-
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG, "Unable to initialize BluetoothLeService");
-                finish();
-                return;
-            }
-            final int n = mBluetoothLeService.numConnectedDevices();
-            if (n > 0) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-
-                        Log.e(TAG, "Multiple connections!");
-
-                    }
-                });
-            } else {
-                startScan();
-                Log.i(TAG, "BluetoothLeService connected");
-            }
-        }
-
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBluetoothLeService = null;
-            Log.i(TAG, "BluetoothLeService disconnected");
-        }
-    };
-
-    void onConnect() {
-        if (bleDeviceManager.getNumOfDevice() > 0) {
-            int connState = mBluetoothManager.getConnectionState(mBluetoothDevice, BluetoothGatt.GATT);
-            switch (connState) {
-                case BluetoothGatt.STATE_CONNECTED:
-                    mBluetoothLeService.disconnect(null);
-                    break;
-                case BluetoothGatt.STATE_DISCONNECTED:
-                    boolean ok = mBluetoothLeService.connect(mBluetoothDevice.getAddress());
-                    if (!ok) {
-                        Toast.makeText(MainActivity.this, "蓝牙连接失败", Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-                default:
-                    Toast.makeText(MainActivity.this, "设备繁忙", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    }
-
-    /*
-	开始扫描
-	 */
-    private void startScan() {
-        // Start device discovery
-        if (mBleSupported) {
-            bleDeviceManager.clear();
-            //TODO LIST:predator
-            devicePicker.setDeviceList(null);
-            scanLeDevice(true);
-            //TODO LIST:修改连接的状态
-            // new ConnectDemoTask().execute();
-            if (!mScanning) {
-                Log.e(TAG, "bluetooth device scanning falied");
-            }
-        } else {
-            Toast.makeText(MainActivity.this, "BLE not supported on this device", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void stopScan() {
-        mScanning = false;
-        scanLeDevice(false);
-    }
-
-    /**
-     * 处理三类action
-     * ACTION_STATE_CHANGED：蓝牙设备状态变化（开启，关闭）
-     * ACTION_GATT_CONNECTED：连接上设备
-     * ACTION_GATT_DISCONNECTED：设备断开
-     */
-    private BroadcastReceiver mReceiver = new BroadcastReceiver()
-    {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            final String action = intent.getAction();
-
-            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action))
-            {
-                // Bluetooth adapter state change
-                switch (mBtAdapter.getState()) {
-                    case BluetoothAdapter.STATE_ON:
-                        bleDeviceManager.setmConnIndex(BleDeviceManager.NO_DEVICE);
-                        startBluetoothLeService();
-                        break;
-                    case BluetoothAdapter.STATE_OFF:
-                        Toast.makeText(context, "蓝牙已关闭", Toast.LENGTH_LONG).show();
-                        break;
-                    default:
-                        Log.w(TAG, "Action STATE CHANGED not processed ");
-                        break;
-                }
-            }
-            else if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action))
-            {
-                int status = intent.getIntExtra(BluetoothLeService.EXTRA_STATUS, BluetoothGatt.GATT_FAILURE);
-                if (status == BluetoothGatt.GATT_SUCCESS)
-                {
-                    isConnected = true;
-                    // Create GATT object
-                    mBtGatt = BluetoothLeService.getBtGatt();
-
-                    if (!mIsReceiving) {
-                        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-                        mIsReceiving = true;
-                    }
-
-                    // Start service discovery
-                    if (!mServicesRdy && mBtGatt != null) {
-                        if (mBluetoothLeService.getNumServices() == 0)
-                            //TODO LIST：初始化后即开始扫描服务
-                            discoverServices();
-                        else
-                            displayServices();
-                    }
-                }
-                else {
-                    Log.e(TAG, "connection failed" + status);
-                }
-            }
-            else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action))
-            {
-                // GATT disconnect
-                int status = intent.getIntExtra(BluetoothLeService.EXTRA_STATUS, BluetoothGatt.GATT_FAILURE);
-
-                if (status == BluetoothGatt.GATT_SUCCESS)
-                {
-/*
-                    isConnected = false;
-*/
-                    Log.i(TAG, "Disconnect device:" + mBluetoothDevice.getName());
-
-                } else {
-                    Log.e(TAG, "Disconnect failed. Status: " + status);
-                }
-                bleDeviceManager.setmConnIndex(BleDeviceManager.NO_DEVICE);
-                mBluetoothLeService.close();
-                ib_device.setImageResource(R.drawable.dv_disconneted);
-                Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
-                mServicesRdy = false;
-                mBluetoothLeService.disconnect(mBluetoothDevice.getAddress());
-
-/*
-                startScan();//重新扫描设备
-*/
-
-            } else {
-                Log.w(TAG,"Unknown action: " + action);
-            }
-        }
-    };
-
-
-    private Handler mScanHandler = new Handler();
-    private int SCAN_PERIOD = 20000;
-    private boolean scanLeDevice(boolean enable) {
-        if (enable) {
-            mScanHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBtAdapter.stopLeScan(mLeScanCallback);
-                }
-            }, SCAN_PERIOD);
-            mScanning = mBtAdapter.startLeScan(mLeScanCallback);
-        } else {
-            mScanning = false;
-            mBtAdapter.stopLeScan(mLeScanCallback);
-        }
-        return mScanning;
-    }
-
-    // Device scan callback.
-    // NB! Nexus 4 and Nexus 7 (2012) only provide one scan result per scan
-    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-
-        public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    // Filter devices
-                    bleDeviceManager.updateOrAdd(device, rssi);
-                    devicePicker.setDeviceList(bleDeviceManager.getDevices());
-
-                    if (!devicePicker.isShowing() && devicePicker.deviceList!=null &&
-                            devicePicker.deviceList.size() != 0) {
-                        devicePicker.show();
-                    }
-                }
-
-            });
-        }
-    };
-
-
-
-    /**
-     * ---------------------------after connection----------------------------
-     */
-
-    /**
-     * discover the services after connection
-     */
-    private void discoverServices() {
-        if (mBtGatt.discoverServices()) {
-            Log.i(TAG, "START SERVICE DISCOVERY");
-            mServiceList.clear();
-        } else {
-            Log.i(TAG, "Faild SERVICE DISCOVERY");
-        }
-    }
-
-    private void displayServices() {
-        mServicesRdy = true;
-        try {
-            mServiceList = mBluetoothLeService.getSupportedGattServices();
-        } catch (Exception e) {
-            e.printStackTrace();
-            mServicesRdy = false;
-        }
-
-        // Characteristics descriptor readout done
-        if (mServicesRdy) {
-            enableNotificationForAir(true);
-            ib_device.setImageResource(R.drawable.dv_connected);
-           Toast.makeText(getApplication(), "设备已连接", Toast.LENGTH_LONG).show();
-        }
-        else {
-/*
-            setError("Failed to read services");
-*/
-        }
-    }
-
-    private void enableNotificationForAir(boolean enable) {
-
-        //UUID RX_SERVICE_UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
-        UUID RX_SERVICE_UUID = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb");
-        BluetoothGattService RxService = mBtGatt.getService(RX_SERVICE_UUID);
-        if (RxService == null) {
-            return;
-        }
-
-
-        UUID TX_CHAR_UUID = UUID.fromString("0000fffa-0000-1000-8000-00805f9b34fb");
-        BluetoothGattCharacteristic TxChar = RxService.getCharacteristic(TX_CHAR_UUID);
-        if (TxChar == null) {
-            return;
-        }
-
-        mBtGatt.setCharacteristicNotification(TxChar,true);
-
-        UUID CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-        BluetoothGattDescriptor descriptor = TxChar.getDescriptor(CCCD);
-        if (descriptor == null) {
-            return;
-        }
-        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        mBtGatt.writeDescriptor(descriptor);
-
-    }
-
-
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            int status = intent.getIntExtra(BluetoothLeService.EXTRA_STATUS, BluetoothGatt.GATT_SUCCESS);
-            if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    //TODO LIST：显示当前的服务列表信息
-                    displayServices();
-                    //checkOad();
-                } else {
-                    //  Toast.makeText(getApplication(), "Service discovery failed", Toast.LENGTH_LONG).show();
-                    return;
-                }
-            } else if (BluetoothLeService.ACTION_DATA_NOTIFY.equals(action)) {
-
-                final byte[] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                String uuidStr = intent.getStringExtra(BluetoothLeService.EXTRA_UUID);
-                //TODO LIST:注销当前的值
-                MainActivity.this.onCharacteristicChanged(uuidStr, value);
-                Log.i("进入Notify方法", "ACTION_DATA_NOTIFY");
-
-            } else if (BluetoothLeService.ACTION_DATA_WRITE.equals(action)) {
-                // Data written
-                String uuidStr = intent.getStringExtra(BluetoothLeService.EXTRA_UUID);
-                onCharacteristicWrite(uuidStr,status);
-                Log.i("进入Write方法", "ACTION_DATA_WRITE");
-
-            } else if (BluetoothLeService.ACTION_DATA_READ.equals(action)) {
-                // Data read
-                String uuidStr = intent.getStringExtra(BluetoothLeService.EXTRA_UUID);
-                byte  [] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                onCharacteristicsRead(uuidStr,value,status);
-                Log.i("进入Read方法", "ACTION_DATA_READ");
-
-            }
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-            }
-        }
-    };
-
-    private void onCharacteristicWrite(String uuidStr, int status) {
-        Log.d(TAG, "onCharacteristicWrite: " + uuidStr);
     }
 
     private void onCharacteristicChanged(String uuidStr, final byte[] value) {
@@ -1114,8 +687,9 @@ public class MainActivity extends BaseActivity {
             iv_background.setImageResource(bg_ids[2]);
         }
     }
+
     private void showResult(float temp, float humi, float pm1,
-                            float pm, float pm10,float hcho, float cell) {
+                            float pm, float pm10, float hcho, float cell) {
 
         this.changeBackgroundImage(hcho, pm);
 
@@ -1236,17 +810,5 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void onCharacteristicsRead(String uuidStr, byte [] value, int status) {
-        Log.i(TAG, "onCharacteristicsRead: " + uuidStr);
-    }
-
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter fi = new IntentFilter();
-        fi.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        fi.addAction(BluetoothLeService.ACTION_DATA_NOTIFY);
-        fi.addAction(BluetoothLeService.ACTION_DATA_WRITE);
-        fi.addAction(BluetoothLeService.ACTION_DATA_READ);
-        return fi;
-    }
 
 }//end of file
