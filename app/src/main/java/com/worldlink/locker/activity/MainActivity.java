@@ -618,9 +618,18 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onConnectFailure(BleException exception) {
                         Log.i(TAG, "连接失败或连接中断：" + exception.toString());
-                        Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
                         bleManager.handleException(exception);
-                        ib_device.setImageResource(R.drawable.dv_disconneted);
+
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                try {
+                                    Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
+                                    ib_device.setImageResource(R.drawable.dv_disconneted);
+                                } catch (Exception e) {
+                                    Log.e(TAG, e.getMessage());
+                                }
+                            }
+                        });
                     }
 
                 }
@@ -632,18 +641,24 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onDestroy() {
         Log.d(TAG, "Destroy");
-        bleManager.stopNotify(UUID_SERVICE, UUID_NOTIFY);
-        bleManager.closeBluetoothGatt();
-        bleManager = null;
+        if (bleManager.isConnectingOrConnected()) {
+            bleManager.stopNotify(UUID_SERVICE, UUID_NOTIFY);
+            bleManager.closeBluetoothGatt();
+            bleManager = null;
+        }
         super.onDestroy();
     }
 
-    private void onCharacteristicChanged(String uuidStr, final byte[] value) {
+    private void onCharacteristicChanged(String uuidStr, final byte[] srcValue) {
         //TODO LIST:更新界面
         this.runOnUiThread(new Runnable() {
             public void run() {
                 try {
-                    byte[] temp = {value[4], value[3], value[2], value[1]};
+                    int[] value = new int[srcValue.length];
+                    for (int i = 0; i < srcValue.length; i++) {
+                        value[i] = srcValue[i] & 0xff;
+                    }
+                    byte[] temp = {(byte)value[4], (byte)value[3], (byte)value[2], (byte)value[1]};
                     DataInputStream dis = new DataInputStream(new
                             ByteArrayInputStream(temp));
                     float fTemp = dis.readFloat();
@@ -651,26 +666,39 @@ public class MainActivity extends BaseActivity {
                     fTemp = b.setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
                     dis.close();
 
-                    byte humi = value[5];
+                    Log.i("温度:", fTemp + "字节码" + temp.toString());
 
-                    byte hiPm1 = value[6];
-                    byte lowPm1 = value[7];
+
+                    int humi = value[5];
+                    Log.i("湿度:", humi + "字节码" + humi);
+
+
+                    int hiPm1 = value[6];
+                    int lowPm1 = value[7];
                     float pm1 = hiPm1 * 256 + lowPm1;
+                    Log.i("pm1:", pm1 + "字节码高位：" + hiPm1 + "低位:" + lowPm1);
 
-                    byte hiPm25 = value[8];
-                    byte lowPm25 = value[9];
+
+                    int hiPm25 = value[8];
+                    int lowPm25 = value[9];
                     float pm25 = hiPm25 * 256 + lowPm25;
+                    Log.i("pm25:", pm25 + "字节码高位：" + hiPm25 + "低位:" + lowPm25);
 
-                    byte hiPm10 = value[10];
-                    byte lowPm10 = value[11];
+
+                    int hiPm10 = value[10];
+                    int lowPm10 = value[11];
                     float pm10 = hiPm10 * 256 + lowPm10;
+                    Log.i("pm10:", pm10 + "字节码高位：" + hiPm10 + "低位:" + lowPm10);
 
-                    byte hiHcho = value[12];
-                    byte lowHcho = value[13];
+
+                    int hiHcho = value[12];
+                    int lowHcho = value[13];
                     float hcho = (float) ((hiHcho * 256 + lowHcho) / 1000.0);
                     BigDecimal b2 = new BigDecimal(hcho);
                     hcho = b2.setScale(3, BigDecimal.ROUND_HALF_UP).floatValue();
-                    byte cell = value[14];
+                    Log.i("甲醛:", hcho + "字节码高位：" + hiHcho + "低位:" + lowHcho);
+
+                    int cell = value[14];
                     showResult(fTemp, humi, pm1, pm25, pm10, hcho, cell);
                 } catch (Exception e) {
                 }
