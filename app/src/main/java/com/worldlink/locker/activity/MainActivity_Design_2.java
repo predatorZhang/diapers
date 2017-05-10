@@ -20,11 +20,15 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.transition.ChangeBounds;
+import android.transition.Scene;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,7 +46,6 @@ import android.widget.Toast;
 import com.rey.material.app.Dialog;
 import com.rey.material.app.DialogFragment;
 import com.rey.material.app.SimpleDialog;
-//import com.rey.material.widget.RelativeLayout;
 import com.rey.material.widget.SnackBar;
 import com.rey.material.widget.Spinner;
 import com.worldlink.locker.R;
@@ -61,10 +64,12 @@ import java.util.UUID;
 import cn.qqtheme.framework.picker.NumberPicker;
 import cn.qqtheme.framework.picker.OptionPicker;
 
+//import com.rey.material.widget.RelativeLayout;
+
 //@NoTitle
 //@Fullscreen
 //@EActivity(R.layout.activity_main)
-public class MainActivity_Design extends BaseActivity {
+public class MainActivity_Design_2 extends BaseActivity {
 
 
 //    @ViewById
@@ -102,8 +107,6 @@ public class MainActivity_Design extends BaseActivity {
     private TextView tv_unit_middle;
     private RelativeLayout rl_middle;
     private ImageView iv_circle_middle;
-    private ImageView iv_circle_middle_outer;
-    private ImageView iv_circle_middle_inner;
 
     //left widget
     private TextView tv_index_left;
@@ -111,8 +114,6 @@ public class MainActivity_Design extends BaseActivity {
     private TextView tv_unit_left;
     private RelativeLayout rl_left;
     private ImageView iv_circle_left;
-    private ImageView iv_circle_left_outer;
-    private ImageView iv_circle_left_inner;
     //right widget
     private TextView tv_index_right;
     private TextView tv_title_right;
@@ -121,7 +122,7 @@ public class MainActivity_Design extends BaseActivity {
     private ImageView iv_circle_right;
 
     //weather report
-    private ImageButton ib_weather;
+    private ImageView iv_weather;
 
     private Animation anim_1;
     private Animation anim_2;
@@ -150,6 +151,12 @@ public class MainActivity_Design extends BaseActivity {
     private List<Sensor> mEnabledSensors = new ArrayList<Sensor>();
 
     private List<BleDeviceInfo> devices=new ArrayList<BleDeviceInfo>();
+    //material animations
+    private Scene scene_1;
+    private Scene scene_2;
+    private Scene scene_3;
+    private Scene mScene;
+    private ViewGroup sceneRoot;
     BaseAdapter adapter = new BaseAdapter() {
 
         @Override
@@ -375,136 +382,71 @@ public class MainActivity_Design extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main_2);
+        setContentView(R.layout.activity_main_3);
         //link widgets
 //        sv_progress = (SinkView) findViewById(R.id.sv_progress);
 //        tv_index = (TextView) findViewById(R.id.tv_index);
 //        iv_circle = (ImageView) findViewById(R.id.iv_circle);
 //        iv_circle.setBackgroundResource(R.drawable.circle5);
-        rl_middle = (RelativeLayout) findViewById(R.id.rl_middle);
-        tv_index_middle = (TextView) findViewById(R.id.tv_index_middle);
-        tv_title_middle = (TextView) findViewById(R.id.tv_title_middle);
-        tv_unit_middle = (TextView) findViewById(R.id.tv_unit_middle);
-        iv_circle_middle = (ImageView) findViewById(R.id.iv_circle_middle);
-        iv_circle_middle.setBackgroundResource(R.drawable.circle5);
-        iv_circle_middle_inner = (ImageView) findViewById(R.id.iv_middle_inner_circle);
-        iv_circle_middle_outer = (ImageView) findViewById(R.id.iv_middle_outer_circle);
+//        rl_middle = (RelativeLayout) findViewById(R.id.rl_middle);
+//        tv_index_middle = (TextView) findViewById(R.id.tv_index_middle);
+//        tv_title_middle = (TextView) findViewById(R.id.tv_title_middle);
+//        tv_unit_middle = (TextView) findViewById(R.id.tv_unit_middle);
+//        iv_circle_middle = (ImageView) findViewById(R.id.iv_circle_middle);
+//        iv_circle_middle.setBackgroundResource(R.drawable.circle5);
 
-        rl_left = (RelativeLayout) findViewById(R.id.rl_left);
-        tv_index_left = (TextView) findViewById(R.id.tv_index_left);
-        tv_title_left = (TextView) findViewById(R.id.tv_title_left);
-        tv_unit_left = (TextView) findViewById(R.id.tv_unit_left);
-        iv_circle_left = (ImageView) findViewById(R.id.iv_circle_left);
-        iv_circle_left.setBackgroundResource(R.drawable.circle5);
-        iv_circle_left_inner = (ImageView) findViewById(R.id.iv_left_inner_circle);
-        iv_circle_left_outer = (ImageView) findViewById(R.id.iv_left_outer_circle);
+//        rl_left = (RelativeLayout) findViewById(R.id.rl_left);
+//        tv_index_left = (TextView) findViewById(R.id.tv_index_left);
+//        tv_title_left = (TextView) findViewById(R.id.tv_title_left);
+//        tv_unit_left = (TextView) findViewById(R.id.tv_unit_left);
+//        iv_circle_left = (ImageView) findViewById(R.id.iv_circle_left);
+//        iv_circle_left.setBackgroundResource(R.drawable.circle5);
 
-        rl_right = (RelativeLayout) findViewById(R.id.rl_right);
-        tv_index_right = (TextView) findViewById(R.id.tv_index_right);
-        tv_title_right = (TextView) findViewById(R.id.tv_title_right);
-        tv_unit_right = (TextView) findViewById(R.id.tv_unit_right);
-        iv_circle_right = (ImageView) findViewById(R.id.iv_circle_right);
-        iv_circle_right.setBackgroundResource(R.drawable.circle5);
+//        rl_right = (RelativeLayout) findViewById(R.id.rl_right);
+//        tv_index_right = (TextView) findViewById(R.id.tv_index_right);
+//        tv_title_right = (TextView) findViewById(R.id.tv_title_right);
+//        tv_unit_right = (TextView) findViewById(R.id.tv_unit_right);
+//        iv_circle_right = (ImageView) findViewById(R.id.iv_circle_right);
+//        iv_circle_right.setBackgroundResource(R.drawable.circle5);
 
-        rl_left.setOnClickListener(onLeftClick);
-        rl_right.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(transition){
-                    //animation hasn't finished
-                    return;
-                }
-                transition = true;
-                v.setVisibility(View.INVISIBLE);
-                rl_middle.setVisibility(View.INVISIBLE);
-                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_left_top);
-                Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_right_bottom);
-                v.startAnimation(anim_1);
-                rl_middle.startAnimation(anim_tmp);
+//        rl_left.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    TransitionManager.go(scene_2, TransitionInflater.from(MainActivity_Design_2.this).inflateTransition(R.transition.slide_and_changebounds_sequential));
+//                }
+//
+//            }
+//        });
+//        rl_middle.setOnClickListener(new View.OnClickListener(){
+//
+//            @Override
+//            public void onClick(View v) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    TransitionManager.go(scene_1, TransitionInflater.from(MainActivity_Design_2.this).inflateTransition(R.transition.slide_and_changebounds_sequential_with_interpolators));
+//                }
+//            }
+//        });
+//        rl_right.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    TransitionManager.go(scene_3, TransitionInflater.from(MainActivity_Design_2.this).inflateTransition(R.transition.changebounds_sequential));
+//                }
+//            }
+//        });
 
-                anim_1.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+        iv_weather = (ImageView) findViewById(R.id.iv_weather);
 
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        anim_1 = null;
-                        //switch content
-                        String str = (String) tv_index_right.getText();
-                        tv_index_right.setText(tv_index_middle.getText());
-                        tv_index_middle.setText(str);
-
-                        str = (String) tv_title_right.getText();
-                        tv_title_right.setText(tv_title_middle.getText());
-                        tv_title_middle.setText(str);
-
-                        str = (String) tv_unit_right.getText();
-                        tv_unit_right.setText(tv_unit_middle.getText());
-                        tv_unit_middle.setText(str);
-
-                        int value_right = Integer.valueOf((String) tv_index_right.getText());
-                        int value_middle=  Integer.valueOf((String) tv_index_middle.getText());
-
-                        int offset_right = 255 - value_right;
-                        int offset_middle = 255 - value_middle;
-                        GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
-                        drawable_right.setColor(Color.argb(255, offset_right, value_right, 0));
-                        GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
-                        drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
-
-                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_left_top);
-                        anim_2.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-                                rl_right.setVisibility(View.VISIBLE);
-                                rl_middle.setVisibility(View.VISIBLE);
-                                anim_2 = null;
-                                transition = false;
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {
-
-                            }
-                        });
-                        rl_right.startAnimation(anim_2);
-                        Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_right_bottom);
-                        rl_middle.startAnimation(anim_tmp);
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-
-                });
-            }
-        });
-
-        ib_weather = (ImageButton) findViewById(R.id.ib_weather);
-        ib_weather.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSearchRequested();
-            }
-        });
 
         SharedPreferences prefs = getSharedPreferences("background", Context.MODE_PRIVATE);
         int index = prefs.getInt("bg_index", 0);
         iv_background = (ImageView) findViewById(R.id.iv_background);
-        iv_background.setImageResource(bg_ids[index]);
-        index++;
-        if(index >= bg_ids.length){
-            index = 0;
-        }
+//        iv_background.setImageResource(bg_ids[index]);
+//        index++;
+//        if(index >= bg_ids.length){
+//            index = 0;
+//        }
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("bg_index", index);
         editor.commit();
@@ -514,13 +456,25 @@ public class MainActivity_Design extends BaseActivity {
             public void onClick(View v) {
                 if(isConnected){
 //                    ib_device.setImageResource(R.drawable.icon_diaper_alert);
-                    Toast.makeText(MainActivity_Design.this, "Device disconnected.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity_Design_2.this, "Device disconnected.", Toast.LENGTH_SHORT).show();
                     isConnected = false;
                 }else{
                     isConnected = true;
                     //for demo purpose only
-                    Toast.makeText(MainActivity_Design.this, "Device Connected.", Toast.LENGTH_SHORT).show();
-                    new ProgressDemoTask().execute();
+                    Toast.makeText(MainActivity_Design_2.this, "Device Connected.", Toast.LENGTH_SHORT).show();
+//                    new ProgressDemoTask().execute();
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    if(mScene == null){
+                        mScene = scene_1;
+                    }else if(mScene == scene_1){
+                        mScene = scene_2;
+                    }else if(mScene == scene_2){
+                        mScene = scene_3;
+                    }else{
+                        mScene = scene_1;
+                    }
+                    TransitionManager.go(mScene, TransitionInflater.from(MainActivity_Design_2.this).inflateTransition(R.transition.slide_and_changebounds_sequential_with_interpolators));
                 }
             }
         });
@@ -558,6 +512,17 @@ public class MainActivity_Design extends BaseActivity {
             }
         });
         tv_feel = (TextView) findViewById(R.id.tv_feel);
+
+        //view transition
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            sceneRoot = (ViewGroup) findViewById(R.id.scene_root);
+            scene_1 = Scene.getSceneForLayout(sceneRoot, R.layout.scene_1, this);
+            scene_2 = Scene.getSceneForLayout(sceneRoot, R.layout.scene_2, this);
+            scene_3 = Scene.getSceneForLayout(sceneRoot, R.layout.scene_3, this);
+
+        }
+
+
 
     }
 
@@ -629,11 +594,6 @@ public class MainActivity_Design extends BaseActivity {
             unbindService(mServiceConnection);
             mBluetoothLeService = null;
         }
-    }
-
-    @Override
-    public boolean onSearchRequested() {
-        return super.onSearchRequested();
     }
 
     /**
@@ -1099,161 +1059,11 @@ public class MainActivity_Design extends BaseActivity {
         picker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
             @Override
             public void onOptionPicked(String option) {
-                Toast.makeText(MainActivity_Design.this, "Time interval is " + option, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity_Design_2.this, "Time interval is " + option, Toast.LENGTH_SHORT).show();
             }
         });
         picker.show();
     }
-
-    /**
-     * onclick
-     */
-    View.OnClickListener onLeftClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if(transition){
-                //animation hasn't finished
-                return;
-            }
-            transition = true;
-            v.setVisibility(View.INVISIBLE);
-            rl_middle.setVisibility(View.INVISIBLE);
-//                anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_down_right_top);
-            anim_1 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.anim_left_out);
-            Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.anim_middle_trans);
-            v.startAnimation(anim_1);
-            rl_middle.startAnimation(anim_tmp);
-
-            anim_1.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    anim_1 = null;
-                    //switch content & layout parameters
-                    //index
-//                    String str = (String) tv_index_left.getText();
-                    ViewGroup.LayoutParams params_tv_left = tv_index_left.getLayoutParams();
-//                    tv_index_left.setText(tv_index_middle.getText());
-                    tv_index_left.setLayoutParams(tv_index_middle.getLayoutParams());
-//                    tv_index_middle.setText(str);
-                    tv_index_middle.setLayoutParams(params_tv_left);
-//                        float text_size_index_left = tv_index_left.getTextSize();
-                    tv_index_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
-                    tv_index_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                    TextView tv = tv_index_left;
-                    tv_index_left = tv_index_middle;
-                    tv_index_middle = tv;
-                    //title
-//                    str = (String) tv_title_left.getText();
-//                    tv_title_left.setText(tv_title_middle.getText());
-//                    tv_title_middle.setText(str);
-                    ViewGroup.LayoutParams params_tv_title_left = tv_title_left.getLayoutParams();
-                    tv_title_left.setLayoutParams(tv_title_middle.getLayoutParams());
-                    tv_title_middle.setLayoutParams(params_tv_title_left);
-//                        float text_size_title_left = tv_title_left.getTextSize();
-                    tv_title_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                    tv_title_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                    tv = tv_title_left;
-                    tv_title_left = tv_title_middle;
-                    tv_title_middle = tv;
-                    //unit
-//                    str = (String) tv_unit_left.getText();
-//                    tv_unit_left.setText(tv_unit_middle.getText());
-//                    tv_unit_middle.setText(str);
-                    ViewGroup.LayoutParams params_tv_unit_left = tv_unit_left.getLayoutParams();
-                    tv_unit_left.setLayoutParams(tv_unit_middle.getLayoutParams());
-                    tv_unit_middle.setLayoutParams(params_tv_unit_left);
-//                        float text_size_unit_left = tv_unit_left.getTextSize();
-                    tv_unit_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                    tv_unit_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                    tv = tv_unit_left;
-                    tv_unit_left = tv_unit_middle;
-                    tv_unit_middle = tv;
-                    //circles
-                    ViewGroup.LayoutParams params_iv_circle_left = iv_circle_left.getLayoutParams();
-                    iv_circle_left.setLayoutParams(iv_circle_middle.getLayoutParams());
-                    iv_circle_middle.setLayoutParams(params_iv_circle_left);
-                    ImageView iv = iv_circle_left;
-                    iv_circle_left = iv_circle_middle;
-                    iv_circle_middle = iv;
-
-                    ViewGroup.LayoutParams params_iv_circle_left_inner = iv_circle_left_inner.getLayoutParams();
-                    iv_circle_left_inner.setLayoutParams(iv_circle_middle_inner.getLayoutParams());
-                    iv_circle_middle_inner.setLayoutParams(params_iv_circle_left_inner);
-                    iv = iv_circle_left_inner;
-                    iv_circle_left_inner = iv_circle_middle_inner;
-                    iv_circle_middle_inner = iv;
-
-                    ViewGroup.LayoutParams params_iv_circle_left_outer = iv_circle_left_outer.getLayoutParams();
-                    iv_circle_left_outer.setLayoutParams(iv_circle_middle_outer.getLayoutParams());
-                    iv_circle_middle_outer.setLayoutParams(params_iv_circle_left_outer);
-                    iv = iv_circle_left_outer;
-                    iv_circle_left_outer = iv_circle_middle_outer;
-                    iv_circle_middle_outer = iv;
-
-                    //root view
-                    ViewGroup.LayoutParams params_rl_left = rl_left.getLayoutParams();
-                    rl_left.setLayoutParams(rl_middle.getLayoutParams());
-                    rl_middle.setLayoutParams(params_rl_left);
-                    RelativeLayout rl = rl_left;
-                    rl_left = rl_middle;
-                    rl_middle = rl;
-                    rl_left.setOnClickListener(onLeftClick);
-                    rl_middle.setOnClickListener(null);
-
-                    int value_left = Integer.valueOf((String) tv_index_left.getText());
-                    int value_middle=  Integer.valueOf((String) tv_index_middle.getText());
-
-                    int offset_left = 255 - value_left;
-                    int offset_middle = 255 - value_middle;
-                    GradientDrawable drawable_left = (GradientDrawable) iv_circle_left.getBackground();
-                    drawable_left.setColor(Color.argb(255, offset_left, value_left, 0));
-                    GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
-                    drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
-
-//                        anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.scale_up_right_top);
-                    anim_2 = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.anim_middle_in);
-                    anim_2.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-
-                            rl_middle.setVisibility(View.VISIBLE);
-                            anim_2 = null;
-                            transition = false;
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-
-                    Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity_Design.this, R.anim.anim_middle_in);
-//                    rl_left.startAnimation(anim_2);
-                    rl_left.setVisibility(View.VISIBLE);
-                    rl_middle.startAnimation(anim_2);
-//                        rl_middle.startAnimation(anim_2);
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-
-            });
-        }
-    };
-
 
     /***
      * added by Stevens
@@ -1302,7 +1112,7 @@ public class MainActivity_Design extends BaseActivity {
 
                 int value_weather = Math.abs(r.nextInt());
                 int index = value_weather % weather_ids.length;
-                ib_weather.setImageResource(weather_ids[index]);
+                iv_weather.setImageResource(weather_ids[index]);
             }
 
 
@@ -1363,7 +1173,7 @@ public class MainActivity_Design extends BaseActivity {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 //                ib_device.setImageResource(R.drawable.icon_diaper_light);
-                Toast.makeText(MainActivity_Design.this, "Device Connected.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity_Design_2.this, "Device Connected.", Toast.LENGTH_SHORT).show();
                 new ProgressDemoTask().execute();
             }
         }//end of ConnectDemoTask

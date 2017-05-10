@@ -115,6 +115,12 @@
         </activity>
 
         <activity
+            android:name="com.worldlink.locker.activity.MainActivity_Design_3"
+            android:label="@string/app_name" >
+
+        </activity>
+
+        <activity
             android:name="com.worldlink.locker.activity.SplashActivity"
             android:label="@string/app_name" >
             <intent-filter>

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.worldlink.locker"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 3
         versionName "2.3"
@@ -27,6 +27,7 @@ dependencies {
     compile 'com.github.rey5137:material:1.2.2'
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.koushikdutta.ion:ion:2.+'
+    compile 'rb.popview:popview:0.1.0'
     compile files('libs/universal-image-loader-1.9.4.jar')
     compile project(':library:WheelPicker')
     compile project(':library:Common')
