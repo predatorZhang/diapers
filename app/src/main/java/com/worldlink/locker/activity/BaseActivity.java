@@ -44,9 +44,7 @@ public class BaseActivity extends UmengActivity {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setCancelable(false);
-
         mInflater = getLayoutInflater();
-
 
     }
 
