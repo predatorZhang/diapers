@@ -315,13 +315,230 @@ public class MainActivity extends BaseActivity {
         params_rl_left =(rl_left.getLayoutParams());
         params_rl_middle =  (rl_middle.getLayoutParams());
         params_rl_right =  (rl_right.getLayoutParams());
+
+        layeroutArray[0] = rl_left;
+        layeroutArray[1] = rl_middle;
+        layeroutArray[2] = rl_right;
+
+        indexViewArray[0] = tv_index_left;
+        indexViewArray[1] = tv_index_middle;
+        indexViewArray[2] = tv_index_right;
+
+        titleViewArray[0] = tv_title_left;
+        titleViewArray[1] = tv_title_middle;
+        titleViewArray[2] = tv_title_right;
+
+        unitViewArray[0] = tv_unit_left;
+        unitViewArray[1] = tv_unit_middle;
+        unitViewArray[2] = tv_unit_right;
+
+        circleViewArray[0] = iv_circle_left;
+        circleViewArray[1] = iv_circle_middle;
+        circleViewArray[2] = iv_circle_right;
+
+        circleInnerViewArray[0] = iv_circle_left_inner;
+        circleInnerViewArray[1] = iv_circle_middle_inner;
+        circleInnerViewArray[2] = iv_circle_right_inner;
+
+        circleOutterViewArray[0] = iv_circle_left_outer;
+        circleOutterViewArray[1] = iv_circle_middle_outer;
+        circleOutterViewArray[2] = iv_circle_right_outer;
+
     }
 
     private boolean flagLeft = false;
 
+
+    private RelativeLayout[] layeroutArray = new RelativeLayout[3];
+    private TextView[] indexViewArray = new TextView[3];
+    private TextView[] titleViewArray = new TextView[3];
+    private TextView[] unitViewArray = new TextView[3];
+    private ImageView[] circleViewArray = new ImageView[3];
+    private ImageView[] circleInnerViewArray = new ImageView[3];
+    private ImageView[] circleOutterViewArray = new ImageView[3];
+
+
+    private void swapLeft() {
+        RelativeLayout tmp;
+        tmp = layeroutArray[0];
+        layeroutArray[0] = layeroutArray[1];
+        layeroutArray[1] = tmp;
+
+        TextView tmpIndex;
+        tmpIndex = indexViewArray[0];
+        indexViewArray[0] = indexViewArray[1];
+        indexViewArray[1] = tmpIndex;
+
+        TextView tmpTitle;
+        tmpTitle = titleViewArray[0];
+        titleViewArray[0] = titleViewArray[1];
+        titleViewArray[1] = tmpTitle;
+
+        TextView tmpUnit;
+        tmpUnit = unitViewArray[0];
+        unitViewArray[0] = unitViewArray[1];
+        unitViewArray[1] = tmpUnit;
+
+        ImageView tmpCirle;
+        tmpCirle = circleViewArray[0];
+        circleViewArray[0] = circleViewArray[1];
+        circleViewArray[1] = tmpCirle;
+
+        ImageView tmpInnerCirle;
+        tmpInnerCirle = circleInnerViewArray[0];
+        circleInnerViewArray[0] = circleInnerViewArray[1];
+        circleInnerViewArray[1] = tmpInnerCirle;
+
+        ImageView tmpOutterCirle;
+        tmpOutterCirle = circleOutterViewArray[0];
+        circleOutterViewArray[0] = circleOutterViewArray[1];
+        circleOutterViewArray[1] = tmpOutterCirle;
+
+    }
+
+    private void swapRight() {
+        RelativeLayout tmp;
+        tmp = layeroutArray[1];
+        layeroutArray[1] = layeroutArray[2];
+        layeroutArray[2] = tmp;
+
+        TextView tmpIndex;
+        tmpIndex = indexViewArray[1];
+        indexViewArray[1] = indexViewArray[2];
+        indexViewArray[2] = tmpIndex;
+
+        TextView tmpTitle;
+        tmpTitle = titleViewArray[1];
+        titleViewArray[1] = titleViewArray[2];
+        titleViewArray[2] = tmpTitle;
+
+        TextView tmpUnit;
+        tmpUnit = unitViewArray[1];
+        unitViewArray[1] = unitViewArray[2];
+        unitViewArray[2] = tmpUnit;
+
+        ImageView tmpCirle;
+        tmpCirle = circleViewArray[1];
+        circleViewArray[1] = circleViewArray[2];
+        circleViewArray[2] = tmpCirle;
+
+        ImageView tmpInnerCirle;
+        tmpInnerCirle = circleInnerViewArray[1];
+        circleInnerViewArray[1] = circleInnerViewArray[2];
+        circleInnerViewArray[2] = tmpInnerCirle;
+
+        ImageView tmpOutterCirle;
+        tmpOutterCirle = circleOutterViewArray[1];
+        circleOutterViewArray[1] = circleOutterViewArray[2];
+        circleOutterViewArray[2] = tmpOutterCirle;
+
+    }
+    View.OnClickListener onLeftClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(transition){
+                return;
+            }
+/*
+            final RelativeLayout tmpHidenLayout = layeroutArray[1];
+*/
+            transition = true;
+            //TODO LIST:清除监听器
+            layeroutArray[0].setOnClickListener(null);
+            layeroutArray[1].setOnClickListener(null);
+            layeroutArray[2].setOnClickListener(null);
+
+            v.setVisibility(View.INVISIBLE);
+            layeroutArray[1].setVisibility(View.INVISIBLE);
+            anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_left_out);
+            Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_trans_left);
+            v.startAnimation(anim_1);
+            layeroutArray[1].startAnimation(anim_tmp);
+
+            anim_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    anim_1 = null;
+                    try {
+
+                        indexViewArray[0].setLayoutParams(params_tv_middle);
+                        indexViewArray[0].setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
+                        indexViewArray[1].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        indexViewArray[1].setLayoutParams(params_tv_left);
+
+                        titleViewArray[0].setLayoutParams(params_tv_title_middle);
+                        titleViewArray[0].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        titleViewArray[1].setLayoutParams(params_tv_title_left);
+                        titleViewArray[1].setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
+
+                        unitViewArray[0].setLayoutParams(params_tv_unit_middle);
+                        unitViewArray[0].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        unitViewArray[1].setLayoutParams(params_tv_unit_left);
+                        unitViewArray[1].setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
+
+                        circleViewArray[0].setLayoutParams(params_iv_circle_middle);
+                        circleInnerViewArray[0].setLayoutParams(params_iv_circle_middle_inner);
+                        circleOutterViewArray[0].setLayoutParams(params_iv_circle_middle_outer);
+
+                        circleViewArray[1].setLayoutParams(params_iv_circle_left);
+                        circleInnerViewArray[1].setLayoutParams(params_iv_circle_left_inner);
+                        circleOutterViewArray[1].setLayoutParams(params_iv_circle_left_outer);
+
+                        layeroutArray[0].setLayoutParams(params_rl_middle);
+                        layeroutArray[1].setLayoutParams(params_rl_left);
+
+                        swapLeft();
+                        layeroutArray[0].setOnClickListener(onLeftClick);
+                        layeroutArray[1].setOnClickListener(null);
+                        layeroutArray[2].setOnClickListener(onRightClick);
+
+                        anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_in);
+                        anim_2.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                layeroutArray[0].setVisibility(View.VISIBLE);
+                                layeroutArray[1].setVisibility(View.VISIBLE);
+                                layeroutArray[2].setVisibility(View.VISIBLE);
+                                anim_2 = null;
+                                transition = false;
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+                        layeroutArray[1].startAnimation(anim_2);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+
+            });
+        }
+    };
+
+
     private RelativeLayout hideLayout;
 
-    View.OnClickListener onLeftClick = new View.OnClickListener() {
+
+   /* View.OnClickListener onLeftClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if(transition){
@@ -476,11 +693,111 @@ public class MainActivity extends BaseActivity {
 
             });
         }
-    };
+    };*/
 
 
     private boolean flagRight = false;
     View.OnClickListener onRightClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(transition){
+                return;
+            }
+/*
+            final RelativeLayout tmpHidenLayout = layeroutArray[2];
+*/
+            transition = true;
+            //TODO LIST:清除监听器
+            layeroutArray[0].setOnClickListener(null);
+            layeroutArray[1].setOnClickListener(null);
+            layeroutArray[2].setOnClickListener(null);
+
+            v.setVisibility(View.INVISIBLE);
+            layeroutArray[1].setVisibility(View.INVISIBLE);
+            anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_right_out);
+            Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_trans_right);
+            v.startAnimation(anim_1);
+            layeroutArray[1].startAnimation(anim_tmp);
+
+            anim_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    anim_1 = null;
+                    try {
+
+                        indexViewArray[2].setLayoutParams(params_tv_middle);
+                        indexViewArray[2].setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
+                        indexViewArray[1].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        indexViewArray[1].setLayoutParams(params_tv_right);
+
+                        titleViewArray[2].setLayoutParams(params_tv_title_middle);
+                        titleViewArray[2].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        titleViewArray[1].setLayoutParams(params_tv_title_right);
+                        titleViewArray[1].setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
+
+                        unitViewArray[2].setLayoutParams(params_tv_unit_middle);
+                        unitViewArray[2].setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        unitViewArray[1].setLayoutParams(params_tv_unit_right);
+                        unitViewArray[1].setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
+
+                        circleViewArray[2].setLayoutParams(params_iv_circle_middle);
+                        circleInnerViewArray[2].setLayoutParams(params_iv_circle_middle_inner);
+                        circleOutterViewArray[2].setLayoutParams(params_iv_circle_middle_outer);
+
+                        circleViewArray[1].setLayoutParams(params_iv_circle_right);
+                        circleInnerViewArray[1].setLayoutParams(params_iv_circle_right_inner);
+                        circleOutterViewArray[1].setLayoutParams(params_iv_circle_right_outer);
+
+                        layeroutArray[2].setLayoutParams(params_rl_middle);
+                        layeroutArray[1].setLayoutParams(params_rl_right);
+
+                        swapRight();
+                        layeroutArray[0].setOnClickListener(onLeftClick);
+                        layeroutArray[1].setOnClickListener(null);
+                        layeroutArray[2].setOnClickListener(onRightClick);
+
+                        anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_in);
+                        anim_2.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                layeroutArray[0].setVisibility(View.VISIBLE);
+                                layeroutArray[1].setVisibility(View.VISIBLE);
+                                layeroutArray[2].setVisibility(View.VISIBLE);
+                                anim_2 = null;
+                                transition = false;
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+                        layeroutArray[1].startAnimation(anim_2);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+
+            });
+        }
+    };
+   /* View.OnClickListener onRightClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if(transition){
@@ -624,13 +941,13 @@ public class MainActivity extends BaseActivity {
                     });
                     tmpHidenLayout.startAnimation(anim_2);
 
-                  /*  if (flagRight) {
+                  *//*  if (flagRight) {
                         rl_right.setVisibility(View.VISIBLE);
                         tmpHidenLayout.startAnimation(anim_2);
                     } else {
                         tmpHidenLayout.setVisibility(View.VISIBLE);
                         rl_right.startAnimation(anim_2);
-                    }*/
+                    }*//*
                 }
 
                 @Override
@@ -640,7 +957,7 @@ public class MainActivity extends BaseActivity {
 
             });
         }
-    };
+    };*/
 
     /*
         @Click
@@ -1067,7 +1384,7 @@ public class MainActivity extends BaseActivity {
         } else if (cell <= 60 && cell > 50) {
             this.ic_battery.setImageResource(R.drawable.ic_battery_half);
 
-        } else if (cell <= 50 && cell > 20) {
+        } else if (cell <= 50 && cell > 10) {
             this.ic_battery.setImageResource(R.drawable.ic_battery_14);
         } else {
             this.ic_battery.setImageResource(R.drawable.ic_battery_low);
@@ -1110,19 +1427,19 @@ public class MainActivity extends BaseActivity {
             drawable0.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_right.setText("优");
         } else if (pm >= 35 && pm < 75) {
-            drawable.setColor(Color.argb(255, 0, 0, 255));
+            drawable0.setColor(Color.argb(255, 0, 0, 255));
             this.tv_unit_right.setText("良");
         } else if (pm >= 75 && pm < 115) {
-            drawable.setColor(Color.argb(255, 50, 0, 0));
+            drawable0.setColor(Color.argb(255, 50, 0, 0));
             this.tv_unit_right.setText("轻度污染");
         } else if (pm >= 115 && pm < 150) {
-            drawable.setColor(Color.argb(255, 100, 0, 0));
+            drawable0.setColor(Color.argb(255, 100, 0, 0));
             this.tv_unit_right.setText("中度污染");
         } else if (pm >= 150 && pm < 250) {
-            drawable.setColor(Color.argb(255, 255, 0, 0));
+            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("重度污染");
         } else {
-            drawable.setColor(Color.argb(255, 255, 0, 0));
+            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("严重污染");
         }
 
