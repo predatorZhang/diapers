@@ -7,5 +7,10 @@ ext {
 }
 
 dependencies {
-    compile project(":library:Common")
+    compile project(':library:Common')
+}
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion '25.0.0'
 }

@@ -32,6 +32,7 @@ import com.amap.api.location.AMapLocationListener;
 import com.clj.fastble.BleManager;
 import com.clj.fastble.conn.BleCharacterCallback;
 import com.clj.fastble.conn.BleGattCallback;
+import com.clj.fastble.data.ScanResult;
 import com.clj.fastble.exception.BleException;
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
@@ -1216,6 +1217,10 @@ public class MainActivity extends BaseActivity {
                                 Toast.makeText(MainActivity.this.getApplication(), "未找到甲醛检测仪", Toast.LENGTH_LONG).show();
                             }
                         });
+                    }
+
+                    @Override
+                    public void onFoundDevice(ScanResult scanResult) {
 
                     }
 
