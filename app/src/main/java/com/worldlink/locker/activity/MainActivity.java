@@ -37,6 +37,7 @@ import com.clj.fastble.exception.BleException;
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
 import com.daasuu.bl.BubblePopupHelper;
+import com.mob.commons.SHARESDK;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.tencent.android.tpush.XGPushManager;
 import com.tencent.android.tpush.service.XGPushService;
@@ -56,6 +57,9 @@ import org.androidannotations.annotations.ViewById;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.math.BigDecimal;
+
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.framework.utils.ShareSDKR;
 
 
 @EActivity(R.layout.activity_main)
@@ -1056,6 +1060,9 @@ public class MainActivity extends BaseActivity {
 
     @AfterViews
     public void init() {
+        //share sdk
+        ShareSDK.i
+
 
         bleManager = new BleManager(this);
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
