@@ -1398,11 +1398,17 @@ public class MainActivity extends BaseActivity {
             drawable.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_middle.setText("正常");
         } else if (hcho >= 0.1 && hcho < 0.5) {
-            drawable.setColor(Color.argb(255, 50, 0, 0));
+//            drawable.setColor(Color.argb(255, 50, 0, 0));
+            float red = (float) (127.0*hcho);
+            float green = (float) (127.0 * (0.5 - hcho));
+            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("轻度污染");
 
         } else if (hcho >= 0.5 && hcho < 0.6) {
-            drawable.setColor(Color.argb(255, 100, 0, 0));
+//            drawable.setColor(Color.argb(255, 100, 0, 0));
+            float red = (float) (255.0*hcho);
+            float green = (float) (255.0 * (0.5 - hcho));
+            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("污染");
         } else {
             drawable.setColor(Color.argb(255, 255, 0, 0));
@@ -1416,7 +1422,9 @@ public class MainActivity extends BaseActivity {
         this.tv_index_left.setText((int) pm10 + "");
         GradientDrawable drawable1 = (GradientDrawable) iv_circle_left.getBackground();
         if (pm10 < 150) {
-            drawable1.setColor(Color.argb(255, 0, 255, 0));
+            float red = 255 * ((150 - pm10)/150);
+            float green = 255 - red;
+            drawable1.setColor(Color.argb(255, (int)red, (int)green, 0));
         } else {
             drawable1.setColor(Color.argb(255, 255, 0, 0));
         }
@@ -1426,23 +1434,30 @@ public class MainActivity extends BaseActivity {
          */
         GradientDrawable drawable0 = (GradientDrawable) iv_circle_right.getBackground();
         this.tv_index_right.setText((int) pm + "");
+        if(pm < 250){
+            float red = 255 * ((250-pm)/250);
+            float green = 255 -  red;
+            drawable0.setColor(Color.argb(255, (int)red, (int)green, 0));
+        }else{
+            drawable0.setColor(Color.argb(255, 255, 0, 0));
+        }
         if (pm < 35) {
-            drawable0.setColor(Color.argb(255, 0, 255, 0));
+//            drawable0.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_right.setText("优");
         } else if (pm >= 35 && pm < 75) {
-            drawable0.setColor(Color.argb(255, 0, 0, 255));
+//            drawable0.setColor(Color.argb(255, 0, 0, 255));
             this.tv_unit_right.setText("良");
         } else if (pm >= 75 && pm < 115) {
-            drawable0.setColor(Color.argb(255, 50, 0, 0));
+//            drawable0.setColor(Color.argb(255, 50, 0, 0));
             this.tv_unit_right.setText("轻度污染");
         } else if (pm >= 115 && pm < 150) {
-            drawable0.setColor(Color.argb(255, 100, 0, 0));
+//            drawable0.setColor(Color.argb(255, 100, 0, 0));
             this.tv_unit_right.setText("中度污染");
         } else if (pm >= 150 && pm < 250) {
-            drawable0.setColor(Color.argb(255, 255, 0, 0));
+//            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("重度污染");
         } else {
-            drawable0.setColor(Color.argb(255, 255, 0, 0));
+//            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("严重污染");
         }
 
