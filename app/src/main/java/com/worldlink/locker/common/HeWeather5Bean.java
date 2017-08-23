@@ -44,8 +44,8 @@ public class HeWeather5Bean {
 
     public class BasicBean {
         /**
-         * city : 北京
-         * cnty : 中国
+         * city :
+         * cnty :
          * id : CN101010100
          * lat : 39.904000
          * lon : 116.391000
