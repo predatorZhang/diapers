@@ -144,7 +144,6 @@ public class MainActivity extends BaseActivity {
     @ViewById
     public ImageView iv_circle_right;
 
-
     private static final String TAG = "MainActivity";
 
 
