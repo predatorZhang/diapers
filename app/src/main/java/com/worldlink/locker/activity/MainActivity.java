@@ -151,8 +151,6 @@ public class MainActivity extends BaseActivity {
     @ViewById
     public ImageView iv_circle_right;
 
-<<<<<<< HEAD
-=======
     @ViewById
     public ImageView iv_circle_left_inner;
 
@@ -171,8 +169,6 @@ public class MainActivity extends BaseActivity {
     @ViewById
     public ImageView iv_circle_right_inner;
 
-
->>>>>>> origin/ble
     private static final String TAG = "MainActivity";
 
 
