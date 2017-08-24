@@ -23,6 +23,7 @@
 <!--
     <string-array name="device_filter"><item>SensorTag</item></string-array>
 -->
-
+    <!-- ShareSDK-->
+    <string name="share">分享</string>
 
 </resources>

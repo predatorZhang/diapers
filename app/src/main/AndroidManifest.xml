@@ -186,6 +186,10 @@
 
         </activity>
 
+        <!-- 填写您从Mob开发者后台中得到的Appkey和AppSecret -->
+        <meta-data android:name="Mob-AppKey" android:value="206d10678305c"/>
+        <meta-data android:name="Mob-AppSecret" android:value="2dc7b281cfd084e84fafca846397e1e6"/>
+
         <!--微信分享回调 -->
         <activity
             android:name=".wxapi.WXEntryActivity"

@@ -17,6 +17,14 @@
         android:src="@drawable/bg_16"
         android:scaleType="centerCrop"/>
 
+    <ImageButton android:id="@+id/ib_share"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/share"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="20dp"/>
+
 
     <ImageButton
         android:id="@+id/ib_weather2"
