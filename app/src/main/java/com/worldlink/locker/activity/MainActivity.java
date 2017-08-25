@@ -2,6 +2,8 @@ package com.worldlink.locker.activity;
 
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
@@ -14,6 +16,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -196,6 +199,9 @@ public class MainActivity extends BaseActivity {
 
     private static final int REQUEST_CODE_PICK_CITY = 0;
 
+
+    //added by StevenT
+    private boolean shouldNotifyUser = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
         public void onSuccess(Object data) {
@@ -1078,8 +1084,6 @@ public class MainActivity extends BaseActivity {
     @AfterViews
     public void init() {
 
-
-
         bleManager = new BleManager(this);
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_LONG).show();
@@ -1432,19 +1436,44 @@ public class MainActivity extends BaseActivity {
         if (hcho < 0.1) {
             drawable.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_middle.setText("正常");
+            if(!shouldNotifyUser){
+                shouldNotifyUser = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(1);
+            }
         } else if (hcho >= 0.1 && hcho < 0.5) {
 //            drawable.setColor(Color.argb(255, 50, 0, 0));
             float red = (float) (127.0*hcho);
             float green = (float) (127.0 * (0.5 - hcho));
             drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("轻度污染");
-
+            if(!shouldNotifyUser){
+                shouldNotifyUser = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(1);
+            }
         } else if (hcho >= 0.5 && hcho < 0.6) {
 //            drawable.setColor(Color.argb(255, 100, 0, 0));
             float red = (float) (255.0*hcho);
             float green = (float) (255.0 * (0.5 - hcho));
             drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("污染");
+            if(shouldNotifyUser){
+                //user has been notified
+                shouldNotifyUser = false;
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setSmallIcon(R.drawable.logo_hainiu_32);
+                builder.setContentTitle(getString(R.string.notification_title));
+                builder.setContentText(getString(R.string.notification_text));
+                Intent i = new Intent(this, MainActivity_.class);
+                PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                builder.setContentIntent(pi);
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(1, builder.build());
+            }
         } else {
             drawable.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_middle.setText("重度污染");

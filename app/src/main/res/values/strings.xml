@@ -23,10 +23,15 @@
 <!--
     <string-array name="device_filter"><item>SensorTag</item></string-array>
 -->
+
     <!-- ShareSDK-->
     <string name="share">分享</string>
     <string name="share_message">我用海牛空气盒子测试了甲醛和PM2.5浓度，感觉不错哦！ 你也来试试吧~</string>
     <string name="share_error_fail_to_get_screenshot">获取当前截图失败，请稍后重试。</string>
     <string name="share_error_title">错误</string>
     <string name="share_file_name">海牛空气盒子空气指数分享</string>
+
+    <!-- Notification-->
+    <string name="notification_title">警报</string>
+    <string name="notification_text">海牛空气盒子提醒您：检测到甲醛严重污染</string>
 </resources>
