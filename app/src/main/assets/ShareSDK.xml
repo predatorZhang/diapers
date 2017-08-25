@@ -63,7 +63,7 @@
         RedirectUrl="http://www.sharesdk.cn"
         ShareByAppClient="true"
 		ShareByWebApi = "false"
-        Enable="true" />
+        Enable="false" />
 
     <TencentWeibo
         Id="2"
@@ -71,7 +71,7 @@
         AppKey="801307650"
         AppSecret="ae36f4ee3946e1cbb98d6965b0b2ff5c"
         RedirectUri="http://sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
     <QZone
         Id="3"
@@ -79,7 +79,7 @@
         AppId="100371282"
         AppKey="aed9b0303e3ed1e27bae87c33761161d"
 		BypassApproval="true"
-        Enable="true" />
+        Enable="false" />
     
     <!-- 
     	Wechat微信和WechatMoments微信朋友圈的appid是一样的；
@@ -97,8 +97,8 @@
     <Wechat
         Id="4"
         SortId="4"
-        AppId="wx4868b35061f87885"
-        AppSecret="64020361b8ec4c99936c0e3999a9f249"
+        AppId="wxd4453d93c46b9f38"
+        AppSecret="9ee83c74b11d1085f10bcc2e724720f6"
 		userName="gh_afb25ac019c9"
 		path="pages/index/index.html?id=1"
         BypassApproval="true"
@@ -107,17 +107,17 @@
     <WechatMoments
         Id="5"
         SortId="5"
-        AppId="wx4868b35061f87885"
-        AppSecret="64020361b8ec4c99936c0e3999a9f249"
+        AppId="wxd4453d93c46b9f38"
+        AppSecret="9ee83c74b11d1085f10bcc2e724720f6"
         BypassApproval="true"
         Enable="true" />
 
 	<WechatFavorite
         Id="6"
         SortId="6"
-        AppId="wx4868b35061f87885"
-        AppSecret="64020361b8ec4c99936c0e3999a9f249"
-        Enable="true" />
+        AppId="wxd4453d93c46b9f38"
+        AppSecret="9ee83c74b11d1085f10bcc2e724720f6"
+        Enable="false" />
 
 	<!-- ShareByAppClient标识是否使用微博客户端分享，默认是false -->
 	<QQ
@@ -127,7 +127,7 @@
         AppKey="aed9b0303e3ed1e27bae87c33761161d"
         ShareByAppClient ="true"
 		BypassApproval = "false"
-        Enable="true" />
+        Enable="false" />
 
     <Facebook
         Id="8"
@@ -136,7 +136,7 @@
         ConsumerSecret="38053202e1a5fe26c80c753071f0b573"
         RedirectUrl="fbconnect://success"
 		ShareByAppClient="true"
-		Enable="true" />
+		Enable="false" />
 
     <Twitter
         Id="9"
@@ -144,7 +144,7 @@
         ConsumerKey="LRBM0H75rWrU9gNHvlEAA2aOy"
         ConsumerSecret="gbeWsZvA9ELJSdoBzJ5oLKX0TU09UOwrzdGfo9Tg7DjyGuMe8G"
         CallbackUrl="http://mob.com"
-        Enable="true" />
+        Enable="false" />
 
     <Renren
         Id="10"
@@ -152,7 +152,7 @@
         AppId="226427"
         ApiKey="fc5b8aed373c4c27a05b712acba0f8c3"
         SecretKey="f29df781abdd4f49beca5a2194676ca4"
-        Enable="true" />
+        Enable="false" />
 
     <KaiXin
         Id="11"
@@ -160,7 +160,7 @@
         AppKey="358443394194887cee81ff5890870c7c"
         AppSecret="da32179d859c016169f66d90b6db2a23"
         RedirectUri="http://www.sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
     <Email
         Id="12"
@@ -178,7 +178,7 @@
         ApiKey="031a96a3aa8b28af094fc3eaffa17a0d"
         Secret="2e675e730571b75d"
         RedirectUri="http://mob.com"
-        Enable="true" />
+        Enable="false" />
 
     <YouDao
         Id="17"
@@ -187,7 +187,7 @@
         ConsumerKey="dcde25dca105bcc36884ed4534dab940"
         ConsumerSecret="d98217b4020e7f1874263795f44838fe"
         RedirectUri="http://www.sharesdk.cn/"
-        Enable="true" />
+        Enable="false" />
 
     <!--
     	在中国大陆，印象笔记有两个服务器，一个是沙箱（sandbox），一个是生产服务器（china）。
@@ -206,7 +206,7 @@
     	ConsumerKey="sharesdk-7807"
 		ConsumerSecret="d05bf86993836004"
 		ShareByAppClient="true"
-		Enable="true" />
+		Enable="false" />
 
     <LinkedIn
     	Id="20"
@@ -215,7 +215,7 @@
         SecretKey="cC7B2jpxITqPLZ5M"
         RedirectUrl="http://sharesdk.cn"
 		ShareByAppClient="false"
-        Enable="true" />
+        Enable="false" />
 
      <GooglePlus
     	Id="21"
@@ -223,7 +223,7 @@
         ClientID="236300675100-am5pm8km7md1memjevq8rl9pg5c4s4b8.apps.googleusercontent.com"
         RedirectUrl="http://localhost"
         ShareByAppClient = "true"
-        Enable="true" />
+        Enable="false" />
 
      <FourSquare
     	Id="22"
@@ -231,13 +231,13 @@
         ClientID="G0ZI20FM30SJAJTX2RIBGD05QV1NE2KVIM2SPXML2XUJNXEU"
         ClientSecret="3XHQNSMMHIFBYOLWEPONNV4DOTCDBQH0AEMVGCBG0MZ32XNU"
         RedirectUrl="http://www.sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
 	<Pinterest
     	Id="23"
         SortId="23"
         ClientId="1432928"
-        Enable="true" />
+        Enable="false" />
 
      <Flickr
      	Id="24"
@@ -245,7 +245,7 @@
         ApiKey="33d833ee6b6fca49943363282dd313dd"
         ApiSecret="3a2c5b42a8fbb8bb"
         RedirectUri="http://www.sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
     <Tumblr
         Id="25"
@@ -253,7 +253,7 @@
         OAuthConsumerKey="2QUXqO9fcgGdtGG1FcvML6ZunIQzAEL8xY6hIaxdJnDti2DYwM"
 		SecretKey="3Rt0sPFj7u2g39mEVB3IBpOzKnM3JnTtxX2bao2JKk4VV1gtNo"
 		CallbackUrl="http://www.sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
 	<Dropbox
         Id="26"
@@ -261,13 +261,13 @@
         AppKey="i5vw2mex1zcgjcj"
 		AppSecret="3i9xifsgb4omr0s"
 		RedirectUri="https://www.sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
     <VKontakte
     	Id="27"
         SortId="27"
         ApplicationId="3921561"
-        Enable="true" />
+        Enable="false" />
 
     <Instagram
     	Id="28"
@@ -275,7 +275,7 @@
         ClientId="ff68e3216b4f4f989121aa1c2962d058"
 		ClientSecret="1b2e82f110264869b3505c3fe34e31a1"
 		RedirectUri="http://sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
     <!--
     	Yixin易信和YixinMoments易信朋友圈的appid是一样的；
@@ -294,14 +294,14 @@
         SortId="29"
         AppId="yx0d9a9f9088ea44d78680f3274da1765f"
         BypassApproval="true"
-        Enable="true" />
+        Enable="false" />
 
 	<YixinMoments
     	Id="30"
         SortId="30"
         AppId="yx0d9a9f9088ea44d78680f3274da1765f"
         BypassApproval="true"
-        Enable="true" />
+        Enable="false" />
 
 	<Mingdao
     	Id="31"
@@ -309,31 +309,31 @@
         AppKey="EEEE9578D1D431D3215D8C21BF5357E3"
         AppSecret="5EDE59F37B3EFA8F65EEFB9976A4E933"
         RedirectUri="http://sharesdk.cn"
-        Enable="true" />
+        Enable="false" />
 
 	<Line
 	    Id="32"
         SortId="32"
         ChannelID = "1477692153"
         ChannelSecret ="f30c036370f2e04ade71c52eef73a9af"
-        Enable="true" />
+        Enable="false" />
 
 	<KakaoTalk
 	    Id="33"
         SortId="33"
         AppKey="48d3f524e4a636b08d81b3ceb50f1003"
-        Enable="true" />
+        Enable="false" />
 
 	<KakaoStory
 	    Id="34"
         SortId="34"
         AppKey="48d3f524e4a636b08d81b3ceb50f1003"
-        Enable="true" />
+        Enable="false" />
 
     <WhatsApp
         Id="35"
         SortId="35"
-        Enable="true" />
+        Enable="false" />
 
     <Bluetooth
         Id="36"
@@ -344,39 +344,39 @@
         Id="37"
         SortId="37"
         ConsumerKey="32741-389c565043c49947ba7edf05"
-        Enable="true" />
+        Enable="false" />
 
     <Instapaper
         Id="38"
         SortId="38"
         ConsumerKey="4rDJORmcOcSAZL1YpqGHRI605xUvrLbOhkJ07yO0wWrYrc61FA"
         ConsumerSecret="GNr1GespOQbrm8nvd7rlUsyRQsIo3boIbMguAl9gfpdL0aKZWe"
-        Enable="true" />
+        Enable="false" />
 
     <FacebookMessenger
         Id="39"
         SortId="39"
         AppId="107704292745179"
-        Enable="true" />
+        Enable="false" />
 
      <Alipay
         Id="50"
         SortId="50"
         AppId="2015072400185895"
-        Enable="true"/>
+        Enable="false"/>
 
      <AlipayMoments
         Id="51"
         SortId="51"
         AppId="2015072400185895"
-        Enable="true"/>
+        Enable="false"/>
 
      <Dingding
         Id="52"
         SortId="52"
         AppId="dingoanxyrpiscaovl4qlw"
         BypassApproval="false"
-        Enable="true"/>
+        Enable="false"/>
 
     <Youtube
         Id="53"
@@ -385,7 +385,7 @@
         AppSecret="AIzaSyAO06g-0TDpHcsXXO918a7QE3Zdct2bB5E"
         RedirectUrl="http://localhost"
         ShareByAppClient = "true"
-        Enable="true" />
+        Enable="false" />
 
 	<Meipai
 		Id="54"
@@ -393,6 +393,6 @@
 		ClientID="1089867596"
 		AppSecret="y9ym6rrjjijtkt23qtsc"
 		ShareByAppClient = "true"
-		Enable="true"/>
+		Enable="false"/>
 	
 </DevInfor>
