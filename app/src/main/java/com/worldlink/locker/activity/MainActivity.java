@@ -16,6 +16,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.TypedValue;
@@ -1098,10 +1099,10 @@ public class MainActivity extends BaseActivity {
 
         ib_device.setImageResource(R.drawable.dv_disconneted);
         XGPushManager.registerPush(this, "*");
+
         updateNotifyService();
         pushInXiaomi();
         startUpdateService();
-
         startPostion();
 
         iv_circle_middle.setBackgroundResource(R.drawable.circle5);
@@ -1152,6 +1153,16 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    //added by Steven.T
+    //for debugging purpose only
+    private Handler debugHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            showResult(23, 10, 123, 123, 123, 0.46f, 60);
+            super.handleMessage(msg);
+        }
+    };
+
     private AMapLocationClient mLocationClient;
 
     private void startPostion() {
@@ -1200,7 +1211,7 @@ public class MainActivity extends BaseActivity {
     private void updateNotifyService() {
         boolean needPush = true;
         if (needPush) {
-            XGPushManager.registerPush(this, "shit");
+            XGPushManager.registerPush(this, "test");
         } else {
             XGPushManager.registerPush(this, "*");
         }
@@ -1412,6 +1423,16 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    /**
+     *
+     * @param temp
+     * @param humi
+     * @param pm1
+     * @param pm
+     * @param pm10
+     * @param hcho
+     * @param cell
+     */
     private void showResult(float temp, float humi, float pm1,
                             float pm, float pm10, float hcho, float cell) {
 
@@ -1444,22 +1465,10 @@ public class MainActivity extends BaseActivity {
             }
         } else if (hcho >= 0.1 && hcho < 0.5) {
 //            drawable.setColor(Color.argb(255, 50, 0, 0));
-            float red = (float) (127.0*hcho);
-            float green = (float) (127.0 * (0.5 - hcho));
+            float red = (float) (127.0 * (hcho/0.5));
+            float green = 255 - red;
             drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("轻度污染");
-            if(!shouldNotifyUser){
-                shouldNotifyUser = true;
-                //dismiss notification
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(1);
-            }
-        } else if (hcho >= 0.5 && hcho < 0.6) {
-//            drawable.setColor(Color.argb(255, 100, 0, 0));
-            float red = (float) (255.0*hcho);
-            float green = (float) (255.0 * (0.5 - hcho));
-            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
-            this.tv_unit_middle.setText("污染");
             if(shouldNotifyUser){
                 //user has been notified
                 shouldNotifyUser = false;
@@ -1467,6 +1476,7 @@ public class MainActivity extends BaseActivity {
                 builder.setSmallIcon(R.drawable.logo_hainiu_32);
                 builder.setContentTitle(getString(R.string.notification_title));
                 builder.setContentText(getString(R.string.notification_text));
+                builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
                 Intent i = new Intent(this, MainActivity_.class);
                 PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
                 builder.setContentIntent(pi);
@@ -1474,6 +1484,13 @@ public class MainActivity extends BaseActivity {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(1, builder.build());
             }
+
+        } else if (hcho >= 0.5 && hcho < 0.6) {
+//            drawable.setColor(Color.argb(255, 100, 0, 0));
+            float red = (float) (175.0 * (hcho/0.6));
+            float green = 255 - red;
+            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
+            this.tv_unit_middle.setText("污染");
         } else {
             drawable.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_middle.setText("重度污染");
@@ -1486,7 +1503,7 @@ public class MainActivity extends BaseActivity {
         this.tv_index_left.setText((int) pm10 + "");
         GradientDrawable drawable1 = (GradientDrawable) iv_circle_left.getBackground();
         if (pm10 < 150) {
-            float red = 255 * ((150 - pm10)/150);
+            float red = (float) (255 * (pm10/150.0));
             float green = 255 - red;
             drawable1.setColor(Color.argb(255, (int)red, (int)green, 0));
         } else {
@@ -1499,7 +1516,7 @@ public class MainActivity extends BaseActivity {
         GradientDrawable drawable0 = (GradientDrawable) iv_circle_right.getBackground();
         this.tv_index_right.setText((int) pm + "");
         if(pm < 250){
-            float red = 255 * ((250-pm)/250);
+            float red = 255 * (pm / 250);
             float green = 255 -  red;
             drawable0.setColor(Color.argb(255, (int)red, (int)green, 0));
         }else{
@@ -1533,13 +1550,13 @@ public class MainActivity extends BaseActivity {
         } else if (pm1 >= 35 && pm1 < 75) {
             this.tv_pm1_eval.setText("良");
         } else if (pm1 >= 75 && pm1 < 115) {
-            this.tv_pm1_eval.setText("轻度污染");
+            this.tv_pm1_eval.setText("轻度");
         } else if (pm1 >= 115 && pm1 < 150) {
-            this.tv_pm1_eval.setText("中度污染");
+            this.tv_pm1_eval.setText("中度");
         } else if (pm1 >= 150 && pm1 < 250) {
-            this.tv_pm1_eval.setText("重度污染");
+            this.tv_pm1_eval.setText("重度");
         } else {
-            this.tv_pm1_eval.setText("严重污染");
+            this.tv_pm1_eval.setText("严重");
         }
         this.tv_pm1.setText((int) pm1 + "");
 
