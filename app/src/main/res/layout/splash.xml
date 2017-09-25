@@ -16,9 +16,10 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="17dp"
         android:gravity="center_horizontal"
-        android:text="PowerBy 海牛钛氪(北京)有限公司"
+        android:text="Powered By 海牛钛氪(北京)有限公司"
         android:textColor="@color/white"
         android:textSize="12sp" />
+
 
     <View
         android:id="@+id/foreMask"

@@ -114,8 +114,11 @@
             android:name="UMENG_APPKEY"></meta-data>
 
         <!--高德地图APT-->
+        <!--<meta-data android:name="com.amap.api.v2.apikey"-->
+            <!--android:value="d43ee7ceec97e8dde6681fafe7b429f5"/>-->
         <meta-data android:name="com.amap.api.v2.apikey"
-            android:value="d43ee7ceec97e8dde6681fafe7b429f5"/>
+        android:value="f68bbf20c3f9fcc75b2ba28a5b803fcc"/>
+
 
         <activity
             android:name="com.worldlink.locker.activity.MainActivity_"
@@ -123,12 +126,12 @@
             android:launchMode="singleInstance"
             >
         </activity>
-        <activity
-            android:name="com.worldlink.locker.activity.DeviceListActivity_"
-            android:label="@string/app_name"
-            android:icon="@drawable/icon"
-            >
-        </activity>
+        <!--<activity-->
+            <!--android:name="com.worldlink.locker.activity.DeviceListActivity_"-->
+            <!--android:label="@string/app_name"-->
+            <!--android:icon="@drawable/icon"-->
+            <!--&gt;-->
+        <!--</activity>-->
 
         <activity
             android:name="com.worldlink.locker.activity.SplashActivity_"

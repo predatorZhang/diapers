@@ -34,4 +34,5 @@
     <!-- Notification-->
     <string name="notification_title">警报</string>
     <string name="notification_text">海牛空气盒子提醒您：检测到甲醛污染</string>
+    <string name="notification_text_pm25">海牛空气盒子提醒您：检测到PM2.5浓度较高，请注意防护</string>
 </resources>
