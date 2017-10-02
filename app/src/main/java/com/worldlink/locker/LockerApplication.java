@@ -13,7 +13,7 @@ import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 /**
  * Created by admin on 2015/5/3.
  */
-public class LockerApplication extends Application
+public class LockerApplication extends com.mob.MobApplication
 {
     public static float sScale;
     public static int sWidthDp;

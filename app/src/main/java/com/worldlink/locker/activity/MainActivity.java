@@ -3,15 +3,25 @@ package com.worldlink.locker.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -41,6 +51,7 @@ import com.clj.fastble.exception.BleException;
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
 import com.daasuu.bl.BubblePopupHelper;
+import com.mob.commons.SHARESDK;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.tencent.android.tpush.XGPushManager;
 import com.tencent.android.tpush.service.XGPushService;
@@ -60,15 +71,29 @@ import org.androidannotations.annotations.ViewById;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.framework.utils.ShareSDKR;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.wechat.friends.Wechat;
 
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
-
+    private static final String LOG_TAG = "MainActivity";
+    private static final int ID_HCHO = 1001;
+    private static final int ID_PM25 = 1002;
     //added by Stevens
 //    private SinkView sv_progress;
     private int[] bg_ids = {R.drawable.bg_hch0,
@@ -172,6 +197,8 @@ public class MainActivity extends BaseActivity {
     @ViewById
     public ImageView iv_circle_right_inner;
 
+    @ViewById
+    public ImageView ib_share;
 
     private static final String TAG = "MainActivity";
 
@@ -182,6 +209,9 @@ public class MainActivity extends BaseActivity {
 
     private static final int REQUEST_CODE_PICK_CITY = 0;
 
+
+    //added by StevenT
+    private boolean shouldNotifyUser = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
         public void onSuccess(Object data) {
@@ -714,17 +744,28 @@ public class MainActivity extends BaseActivity {
         bleManager.enableBluetooth();
         startScan();
 
-        ib_device.setImageResource(R.drawable.dv_disconneted);
+//        ib_device.setImageResource(R.drawable.dv_disconneted);
+        ib_device.setImageResource(R.drawable.icon_disconnect);
         XGPushManager.registerPush(this, "*");
+
         updateNotifyService();
         pushInXiaomi();
         startUpdateService();
-
-        startPostion();
-
+        startPosition();
+        //restore widgets state
         iv_circle_middle.setBackgroundResource(R.drawable.circle5);
+        GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
+        drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
         iv_circle_left.setBackgroundResource(R.drawable.circle5);
+        drawable = (GradientDrawable) iv_circle_left.getBackground();
+        drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
         iv_circle_right.setBackgroundResource(R.drawable.circle5);
+        drawable = (GradientDrawable) iv_circle_right.getBackground();
+        drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+
+        ic_battery.setImageResource(R.drawable.ic_battery_low);
+        this.tv_cell.setText("--%");
+
 
         iv_background.setImageResource(bg_ids[2]);
         final BubbleLayout bubbleLayout = (BubbleLayout) LayoutInflater.from(this).
@@ -735,6 +776,18 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 startActivityForResult(new Intent(MainActivity.this, CityPickerActivity.class),
                         REQUEST_CODE_PICK_CITY);
+            }
+        });
+
+        ib_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View mView = getWindow().getDecorView().getRootView();
+                mView.setDrawingCacheEnabled(true);
+                Bitmap bmp = Bitmap.createBitmap(mView.getDrawingCache());
+                mView.setDrawingCacheEnabled(false);
+                ScreenshotTask task = new ScreenshotTask();
+                task.execute(bmp);
             }
         });
 
@@ -756,11 +809,24 @@ public class MainActivity extends BaseActivity {
         hideLayout = this.rl_middle;
         this.initLayoutParam();
 
+        //for testing
+//        debugHandler.sendEmptyMessageDelayed(0, 5000);
+
     }
+
+    //added by Steven.T
+    //for debugging purpose only
+    private Handler debugHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            showResult(23, 10, 180, 180, 180, 0.46f, 60);
+            super.handleMessage(msg);
+        }
+    };
 
     private AMapLocationClient mLocationClient;
 
-    private void startPostion() {
+    private void startPosition() {
         this.mLocationClient = new AMapLocationClient(this);
         AMapLocationClientOption option = new AMapLocationClientOption();
         option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
@@ -866,7 +932,7 @@ public class MainActivity extends BaseActivity {
     private void updateNotifyService() {
         boolean needPush = true;
         if (needPush) {
-            XGPushManager.registerPush(this, "shit");
+            XGPushManager.registerPush(this, "test");
         } else {
             XGPushManager.registerPush(this, "*");
         }
@@ -918,7 +984,20 @@ public class MainActivity extends BaseActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ib_device.setImageResource(R.drawable.dv_disconneted);
+                                ib_device.setImageResource(R.drawable.icon_disconnect);
+                                //restore widgets state
+                                iv_circle_middle.setBackgroundResource(R.drawable.circle5);
+                                GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
+                                drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+                                iv_circle_left.setBackgroundResource(R.drawable.circle5);
+                                drawable = (GradientDrawable) iv_circle_left.getBackground();
+                                drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+                                iv_circle_right.setBackgroundResource(R.drawable.circle5);
+                                drawable = (GradientDrawable) iv_circle_right.getBackground();
+                                drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+
+                                ic_battery.setImageResource(R.drawable.ic_battery_low);
+                                tv_cell.setText("--%");
                                 Toast.makeText(MainActivity.this.getApplication(), "未找到甲醛检测仪", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -937,7 +1016,7 @@ public class MainActivity extends BaseActivity {
                             public void run() {
                                 gatt.discoverServices();
                                 Toast.makeText(MainActivity.this.getApplication(), "设备连接已连接", Toast.LENGTH_LONG).show();
-                                ib_device.setImageResource(R.drawable.dv_connected);
+                                ib_device.setImageResource(R.drawable.icon_connect);
 
                             }
                         });
@@ -986,7 +1065,20 @@ public class MainActivity extends BaseActivity {
                             public void run() {
                                 try {
                                     Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
-                                    ib_device.setImageResource(R.drawable.dv_disconneted);
+                                    ib_device.setImageResource(R.drawable.icon_disconnect);
+                                    //restore widgets state
+                                    iv_circle_middle.setBackgroundResource(R.drawable.circle5);
+                                    GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
+                                    drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+                                    iv_circle_left.setBackgroundResource(R.drawable.circle5);
+                                    drawable = (GradientDrawable) iv_circle_left.getBackground();
+                                    drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+                                    iv_circle_right.setBackgroundResource(R.drawable.circle5);
+                                    drawable = (GradientDrawable) iv_circle_right.getBackground();
+                                    drawable.setColor(getResources().getColor(R.color.tpi_unchecked));
+
+                                    ic_battery.setImageResource(R.drawable.ic_battery_low);
+                                    tv_cell.setText("--%");
                                 } catch (Exception e) {
                                     Log.e(TAG, e.getMessage());
                                 }
@@ -1078,6 +1170,16 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    /**
+     *
+     * @param temp
+     * @param humi
+     * @param pm1
+     * @param pm
+     * @param pm10
+     * @param hcho
+     * @param cell
+     */
     private void showResult(float temp, float humi, float pm1,
                             float pm, float pm10, float hcho, float cell) {
 
@@ -1102,12 +1204,39 @@ public class MainActivity extends BaseActivity {
         if (hcho < 0.1) {
             drawable.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_middle.setText("正常");
+            if(!shouldNotifyUser){
+                shouldNotifyUser = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(ID_HCHO);
+            }
         } else if (hcho >= 0.1 && hcho < 0.5) {
-            drawable.setColor(Color.argb(255, 50, 0, 0));
+//            drawable.setColor(Color.argb(255, 50, 0, 0));
+            float red = (float) (127.0 * (hcho/0.5));
+            float green = 255 - red;
+            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("轻度污染");
+            if(shouldNotifyUser){
+                //user has been notified
+                shouldNotifyUser = false;
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setSmallIcon(R.drawable.logo_hainiu_32);
+                builder.setContentTitle(getString(R.string.notification_title));
+                builder.setContentText(getString(R.string.notification_text));
+                builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+                Intent i = new Intent(this, MainActivity_.class);
+                PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                builder.setContentIntent(pi);
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(ID_HCHO, builder.build());
+            }
 
         } else if (hcho >= 0.5 && hcho < 0.6) {
-            drawable.setColor(Color.argb(255, 100, 0, 0));
+//            drawable.setColor(Color.argb(255, 100, 0, 0));
+            float red = (float) (175.0 * (hcho/0.6));
+            float green = 255 - red;
+            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("污染");
         } else {
             drawable.setColor(Color.argb(255, 255, 0, 0));
@@ -1121,7 +1250,9 @@ public class MainActivity extends BaseActivity {
         this.tv_index_left.setText((int) pm10 + "");
         GradientDrawable drawable1 = (GradientDrawable) iv_circle_left.getBackground();
         if (pm10 < 150) {
-            drawable1.setColor(Color.argb(255, 0, 255, 0));
+            float red = (float) (255 * (pm10/150.0));
+            float green = 255 - red;
+            drawable1.setColor(Color.argb(255, (int)red, (int)green, 0));
         } else {
             drawable1.setColor(Color.argb(255, 255, 0, 0));
         }
@@ -1131,23 +1262,41 @@ public class MainActivity extends BaseActivity {
          */
         GradientDrawable drawable0 = (GradientDrawable) iv_circle_right.getBackground();
         this.tv_index_right.setText((int) pm + "");
+        if(pm < 250){
+            float red = 255 * (pm / 250);
+            float green = 255 -  red;
+            drawable0.setColor(Color.argb(255, (int)red, (int)green, 0));
+        }else{
+            drawable0.setColor(Color.argb(255, 255, 0, 0));
+        }
         if (pm < 35) {
-            drawable0.setColor(Color.argb(255, 0, 255, 0));
+//            drawable0.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_right.setText("优");
         } else if (pm >= 35 && pm < 75) {
-            drawable0.setColor(Color.argb(255, 0, 0, 255));
+//            drawable0.setColor(Color.argb(255, 0, 0, 255));
             this.tv_unit_right.setText("良");
         } else if (pm >= 75 && pm < 115) {
-            drawable0.setColor(Color.argb(255, 50, 0, 0));
+//            drawable0.setColor(Color.argb(255, 50, 0, 0));
             this.tv_unit_right.setText("轻度污染");
         } else if (pm >= 115 && pm < 150) {
-            drawable0.setColor(Color.argb(255, 100, 0, 0));
+//            drawable0.setColor(Color.argb(255, 100, 0, 0));
             this.tv_unit_right.setText("中度污染");
         } else if (pm >= 150 && pm < 250) {
-            drawable0.setColor(Color.argb(255, 255, 0, 0));
+//            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("重度污染");
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+            builder.setSmallIcon(R.drawable.logo_hainiu_32);
+            builder.setContentTitle(getString(R.string.notification_title));
+            builder.setContentText(getString(R.string.notification_text_pm25));
+            builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+            Intent i = new Intent(this, MainActivity_.class);
+            PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+            builder.setContentIntent(pi);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(ID_PM25, builder.build());
         } else {
-            drawable0.setColor(Color.argb(255, 255, 0, 0));
+//            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("严重污染");
         }
 
@@ -1159,13 +1308,13 @@ public class MainActivity extends BaseActivity {
         } else if (pm1 >= 35 && pm1 < 75) {
             this.tv_pm1_eval.setText("良");
         } else if (pm1 >= 75 && pm1 < 115) {
-            this.tv_pm1_eval.setText("轻度污染");
+            this.tv_pm1_eval.setText("轻度");
         } else if (pm1 >= 115 && pm1 < 150) {
-            this.tv_pm1_eval.setText("中度污染");
+            this.tv_pm1_eval.setText("中度");
         } else if (pm1 >= 150 && pm1 < 250) {
-            this.tv_pm1_eval.setText("重度污染");
+            this.tv_pm1_eval.setText("重度");
         } else {
-            this.tv_pm1_eval.setText("严重污染");
+            this.tv_pm1_eval.setText("严重");
         }
         this.tv_pm1.setText((int) pm1 + "");
 
@@ -1198,6 +1347,102 @@ public class MainActivity extends BaseActivity {
         }
 
 
+    }
+
+    private static final String SCREENSHOT_PATH = "/sdcard/Hainiu/";
+    private class ScreenshotTask extends AsyncTask<Bitmap, Void, String> {
+
+        @Override
+        protected String doInBackground(Bitmap... params) {
+
+            Bitmap bmp = params[0];
+            String root_path = SCREENSHOT_PATH;
+
+            File testPath = new File(root_path);
+            if(!testPath.exists()){
+                testPath.mkdir();
+            }
+            String filename = MainActivity.this.getString(R.string.share_file_name) + ".jpg";
+            File target = new File(SCREENSHOT_PATH + filename);
+            try {
+                FileOutputStream fos = new FileOutputStream(target);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+
+            return filename;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if(s == null){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(R.string.share_error_title);
+                builder.setMessage(R.string.share_error_fail_to_get_screenshot);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create();
+                builder.show();
+
+            }else{
+                showShare("www.baidu.com", SCREENSHOT_PATH + s, getString(R.string.share_message));
+            }
+            super.onPostExecute(s);
+        }
+    }
+
+    private void showShare(String url, String image_path, String msg) {
+        OnekeyShare oks = new OnekeyShare();
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+                Log.d(LOG_TAG, "onComplete");
+            }
+
+            @Override
+            public void onError(Platform platform, int i, Throwable throwable) {
+
+            }
+
+            @Override
+            public void onCancel(Platform platform, int i) {
+                Log.d(LOG_TAG, "onCancel");
+            }
+        });
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        // 分享时Notification的图标和文字  2.5.9以后的版本不     调用此方法
+        //oks.setNotification(R.drawable.ic_launcher, getString(R.string.app_name));
+        // title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间使用
+        oks.setTitle(getString(R.string.share));
+        // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
+        oks.setTitleUrl(url);
+        // text是分享文本，所有平台都需要这个字段
+        oks.setText(getString(R.string.share_message));
+        // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
+        oks.setImagePath(image_path);//确保SDcard下面存在此张图片
+        // url仅在微信（包括好友和朋友圈）中使用
+        oks.setUrl(url);
+        // comment是我对这条分享的评论，仅在人人网和QQ空间使用
+        oks.setComment(msg);
+        // site是分享此内容的网站名称，仅在QQ空间使用
+        oks.setSite(getString(R.string.app_name));
+        // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+        oks.setSiteUrl(url);
+        // 启动分享GUI
+        oks.show(this);
     }
 
 

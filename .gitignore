@@ -2,6 +2,16 @@
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
+/.idea
+/.gradle
 .DS_Store
 /build
 /captures
+
+*.iml
+
+app/app.iml
+
+diapers.iml
+
+library/library.iml

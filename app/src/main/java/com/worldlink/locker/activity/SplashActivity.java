@@ -89,7 +89,7 @@ public class SplashActivity extends BaseActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                mHandler.sendEmptyMessageDelayed(1, 500);
+                mHandler.sendEmptyMessageDelayed(1, 200);
             }
 
             @Override
@@ -97,7 +97,7 @@ public class SplashActivity extends BaseActivity {
             }
         });
 
-        mHandler.sendEmptyMessageDelayed(0, 900);
+        mHandler.sendEmptyMessageDelayed(0, 200);
 
     }
 

@@ -4,7 +4,7 @@
         <translate
             android:duration="500"
             android:fromXDelta="0%p"
-            android:toXDelta="54%p"
+            android:toXDelta="100%p"
             android:fromYDelta = "0%p"
             android:toYDelta="30%p"
             />
