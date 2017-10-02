@@ -14,7 +14,7 @@
         android:id="@+id/iv_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/bg_16"
+        android:src="@drawable/bg_nightsky"
         android:scaleType="centerCrop"/>
 
     <ImageButton android:id="@+id/ib_share"
