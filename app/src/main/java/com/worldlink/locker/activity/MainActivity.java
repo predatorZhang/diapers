@@ -207,7 +207,7 @@ public class MainActivity extends BaseActivity {
 
 
     //added by StevenT
-    private boolean DEMO = true;
+    private boolean DEMO = false;
     private boolean shouldNotifyUser = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
@@ -745,8 +745,8 @@ public class MainActivity extends BaseActivity {
         }
 
 
-//        ib_device.setImageResource(R.drawable.dv_disconneted);
-        ib_device.setImageResource(R.drawable.icon_bluetooth_red);
+        ib_device.setImageResource(R.drawable.icon_disconnect);
+//        ib_device.setImageResource(R.drawable.icon_bluetooth_red);
         XGPushManager.registerPush(this, "*");
 
         updateNotifyService();
@@ -824,8 +824,8 @@ public class MainActivity extends BaseActivity {
     private Handler debugHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            ib_device.setImageResource(R.drawable.icon_bluetooth);
-//            ib_device.setImageResource(R.drawable.icon_connect);
+//            ib_device.setImageResource(R.drawable.icon_bluetooth);
+            ib_device.setImageResource(R.drawable.icon_connect);
             showResult(23, 10, 180, 180, 180, 0.46f, 60);
             super.handleMessage(msg);
         }
@@ -996,8 +996,8 @@ public class MainActivity extends BaseActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ib_device.setImageResource(R.drawable.icon_bluetooth_red);
-//                                ib_device.setImageResource(R.drawable.icon_disconnect);
+//                                ib_device.setImageResource(R.drawable.icon_bluetooth_red);
+                                ib_device.setImageResource(R.drawable.icon_disconnect);
                                 //restore widgets state
                                 iv_circle_middle.setBackgroundResource(R.drawable.circle5);
                                 GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
@@ -1032,8 +1032,8 @@ public class MainActivity extends BaseActivity {
                             public void run() {
                                 gatt.discoverServices();
                                 Toast.makeText(MainActivity.this.getApplication(), "设备连接已连接", Toast.LENGTH_LONG).show();
-                                ib_device.setImageResource(R.drawable.icon_bluetooth);
-//                                ib_device.setImageResource(R.drawable.icon_connect);
+//                                ib_device.setImageResource(R.drawable.icon_bluetooth);
+                                ib_device.setImageResource(R.drawable.icon_connect);
 
                             }
                         });
@@ -1084,8 +1084,8 @@ public class MainActivity extends BaseActivity {
                             public void run() {
                                 try {
                                     Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
-                                    ib_device.setImageResource(R.drawable.icon_bluetooth_red);
-//                                    ib_device.setImageResource(R.drawable.icon_disconnect);
+//                                    ib_device.setImageResource(R.drawable.icon_bluetooth_red);
+                                    ib_device.setImageResource(R.drawable.icon_disconnect);
                                     //restore widgets state
                                     iv_circle_middle.setBackgroundResource(R.drawable.circle5);
                                     GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
