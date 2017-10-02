@@ -51,7 +51,6 @@ import com.clj.fastble.exception.BleException;
 import com.daasuu.bl.ArrowDirection;
 import com.daasuu.bl.BubbleLayout;
 import com.daasuu.bl.BubblePopupHelper;
-import com.mob.commons.SHARESDK;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.tencent.android.tpush.XGPushManager;
 import com.tencent.android.tpush.service.XGPushService;
@@ -82,10 +81,7 @@ import java.util.HashMap;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.framework.utils.ShareSDKR;
 import cn.sharesdk.onekeyshare.OnekeyShare;
-import cn.sharesdk.wechat.friends.Wechat;
 
 
 @EActivity(R.layout.activity_main)
@@ -96,9 +92,9 @@ public class MainActivity extends BaseActivity {
     private static final int ID_PM25 = 1002;
     //added by Stevens
 //    private SinkView sv_progress;
-    private int[] bg_ids = {R.drawable.bg_hch0,
-            R.drawable.bg_pm25,
-            R.drawable.bg_2};
+    private int[] bg_ids = {
+            R.drawable.bg_nightsky
+    };
 
     @ViewById
     public ImageView iv_background;
@@ -771,8 +767,8 @@ public class MainActivity extends BaseActivity {
         ic_battery.setImageResource(R.drawable.ic_battery_low);
         this.tv_cell.setText("--%");
 
-
         iv_background.setImageResource(R.drawable.bg_image1080p);
+
         final BubbleLayout bubbleLayout = (BubbleLayout) LayoutInflater.from(this).
                 inflate(R.layout.layout_weather_bubble, null);
         weatherPopupWindow = BubblePopupHelper.create(this, bubbleLayout);
@@ -983,6 +979,11 @@ public class MainActivity extends BaseActivity {
 
 
     private void startScan() {
+
+        if (!bleManager.isBlueEnable()) {
+            bleManager.enableBluetooth();
+        }
+
         if (!bleManager.isConnectingOrConnected()) {
         bleManager.scanNameAndConnect(
                 DEVICE_NAME,
@@ -1177,16 +1178,6 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
-    }
-
-    private void changeBackgroundImage(float hcho, float pm25) {
-        if (hcho >= 0.5) {
-            iv_background.setImageResource(bg_ids[0]);
-        } else if (pm25 >= 115) {
-            iv_background.setImageResource(bg_ids[1]);
-        } else {
-            iv_background.setImageResource(bg_ids[2]);
-        }
     }
 
     /**
