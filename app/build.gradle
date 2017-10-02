@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 android {
-    compileSdkVersion 18
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
 
     defaultConfig {
         applicationId "com.worldlink.locker"
@@ -17,7 +17,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    signingConfigs {
+        //调试版的keystore
+        debug {
+            storeFile file("/Users/predator/Documents/JavaTutorial/airBeanDebug.jks")
+            storePassword "hainiu"
+            keyAlias "airBeanDebug"
+            keyPassword "hainiu"
+        }
+       /* //发布版的keystore
+        release {
+            storeFile file("keystore文件所用位置")
+            storePassword "你规定的密码"
+            keyAlias "在创建该keystore文件时你所写的alias"
+            keyPassword "你规定的密码"
+        }*/
+    }
 }
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -42,7 +60,7 @@ dependencies {
     compile project(':library:WheelPicker')
     compile project(':library:Common')
     compile files('libs/mid-sdk-2.20.jar')
-    compile 'com.zaaach:citypicker:1.1'
+    compile 'com.zaaach:citypicker:1.2'
     compile 'com.clj.fastble:FastBleLib:1.1.1'
 
 //    compile project(':library:FastBleLib')

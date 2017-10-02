@@ -1,6 +1,8 @@
 package com.worldlink.locker.activity;
 
 
+import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
@@ -8,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -46,6 +50,7 @@ import com.worldlink.locker.common.HeWeather5Bean;
 import com.worldlink.locker.common.ImageLoadTool;
 import com.worldlink.locker.common.WeatherList;
 import com.worldlink.locker.http.ApiClent;
+import com.zaaach.citypicker.CheckPermissionsListener;
 import com.zaaach.citypicker.CityPickerActivity;
 import com.zaaach.citypicker.utils.StringUtils;
 
@@ -56,6 +61,8 @@ import org.androidannotations.annotations.ViewById;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @EActivity(R.layout.activity_main)
@@ -259,33 +266,6 @@ public class MainActivity extends BaseActivity {
     private ViewGroup.LayoutParams params_rl_left,params_rl_middle, params_rl_right;
 
     private void initLayoutParam() {
-      /*   params_tv_left =new ViewGroup.LayoutParams(tv_index_left.getLayoutParams());
-         params_tv_title_left = new ViewGroup.LayoutParams(tv_title_left.getLayoutParams());
-         params_tv_unit_left = new ViewGroup.LayoutParams(tv_unit_left.getLayoutParams());
-
-         params_tv_right =  new ViewGroup.LayoutParams(tv_index_right.getLayoutParams());
-         params_tv_title_right =  new ViewGroup.LayoutParams(tv_title_right.getLayoutParams());
-         params_tv_unit_right =  new ViewGroup.LayoutParams(tv_unit_right.getLayoutParams());
-
-        params_tv_middle =  new ViewGroup.LayoutParams(tv_index_middle.getLayoutParams());
-        params_tv_title_middle =  new ViewGroup.LayoutParams(tv_title_middle.getLayoutParams());
-        params_tv_unit_middle =  new ViewGroup.LayoutParams(tv_unit_middle.getLayoutParams());
-
-        params_iv_circle_left =  new ViewGroup.LayoutParams(iv_circle_left.getLayoutParams());
-        params_iv_circle_left_inner =  new ViewGroup.LayoutParams(iv_circle_left_inner.getLayoutParams());
-        params_iv_circle_left_outer =  new ViewGroup.LayoutParams(iv_circle_left_outer.getLayoutParams());
-
-        params_iv_circle_middle =  new ViewGroup.LayoutParams(iv_circle_middle.getLayoutParams());
-        params_iv_circle_middle_inner =  new ViewGroup.LayoutParams(iv_circle_middle_inner.getLayoutParams());
-        params_iv_circle_middle_outer = new ViewGroup.LayoutParams( iv_circle_middle_outer.getLayoutParams());
-
-        params_iv_circle_right =  new ViewGroup.LayoutParams(iv_circle_right.getLayoutParams());
-        params_iv_circle_right_inner =  new ViewGroup.LayoutParams(iv_circle_right_inner.getLayoutParams());
-        params_iv_circle_right_outer =  new ViewGroup.LayoutParams(iv_circle_right_outer.getLayoutParams());
-
-        params_rl_left =  new ViewGroup.LayoutParams(rl_left.getLayoutParams());
-        params_rl_middle =  new ViewGroup.LayoutParams(rl_middle.getLayoutParams());
-        params_rl_right =  new ViewGroup.LayoutParams(rl_right.getLayoutParams());*/
 
         params_tv_left =(tv_index_left.getLayoutParams());
         params_tv_title_left = (tv_title_left.getLayoutParams());
@@ -438,9 +418,7 @@ public class MainActivity extends BaseActivity {
             if(transition){
                 return;
             }
-/*
-            final RelativeLayout tmpHidenLayout = layeroutArray[1];
-*/
+
             transition = true;
             //TODO LIST:清除监听器
             layeroutArray[0].setOnClickListener(null);
@@ -537,162 +515,6 @@ public class MainActivity extends BaseActivity {
     private RelativeLayout hideLayout;
 
 
-   /* View.OnClickListener onLeftClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if(transition){
-                //animation hasn't finished
-                return;
-            }
-            final RelativeLayout tmpHidenLayout = hideLayout;
-
-            transition = true;
-            flagLeft = !flagLeft;
-            flagRight = false;
-            rl_right.setOnClickListener(null);
-            rl_middle.setOnClickListener(null);
-            rl_right.setOnClickListener(onRightClick);
-            v.setVisibility(View.INVISIBLE);
-            hideLayout.setVisibility(View.INVISIBLE);
-            anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_left_out);
-            Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_trans_left);
-            v.startAnimation(anim_1);
-            hideLayout.startAnimation(anim_tmp);
-
-            anim_1.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    anim_1 = null;
-                    try {
-                        if (flagLeft) {
-                            tv_index_left.setLayoutParams(params_tv_middle);
-                            tv_index_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
-                            tv_index_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_index_middle.setLayoutParams(params_tv_left);
-                            tv_index_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_index_right.setLayoutParams(params_tv_right);
-
-                            tv_title_left.setLayoutParams(params_tv_title_middle);
-                            tv_title_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_title_middle.setLayoutParams(params_tv_title_left);
-                            tv_title_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                            tv_title_right.setLayoutParams(params_tv_title_middle);
-                            tv_title_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                            tv_unit_left.setLayoutParams(params_tv_unit_middle);
-                            tv_unit_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_unit_middle.setLayoutParams(params_tv_unit_left);
-                            tv_unit_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                            tv_unit_right.setLayoutParams(params_tv_unit_middle);
-                            tv_unit_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                            iv_circle_left.setLayoutParams(params_iv_circle_middle);
-                            iv_circle_left_inner.setLayoutParams(params_iv_circle_middle_inner);
-                            iv_circle_left_outer.setLayoutParams(params_iv_circle_middle_outer);
-
-                            iv_circle_middle.setLayoutParams(params_iv_circle_left);
-                            iv_circle_middle_inner.setLayoutParams(params_iv_circle_left_inner);
-                            iv_circle_middle_outer.setLayoutParams(params_iv_circle_left_outer);
-
-                            iv_circle_right.setLayoutParams(params_iv_circle_right);
-                            iv_circle_right_inner.setLayoutParams(params_iv_circle_right_inner);
-                            iv_circle_right_outer.setLayoutParams(params_iv_circle_right_outer);
-
-                            rl_left.setLayoutParams(params_rl_middle);
-                            rl_middle.setLayoutParams(params_rl_left);
-                            rl_right.setLayoutParams(params_rl_right);
-
-                            rl_left.setOnClickListener(null);
-                            rl_middle.setOnClickListener(onLeftClick);
-
-                            hideLayout = rl_left;
-
-                        } else {
-                            tv_index_left.setLayoutParams(params_tv_left);
-                            tv_index_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_index_middle.setLayoutParams(params_tv_middle);
-                            tv_index_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
-                            tv_index_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_index_right.setLayoutParams(params_tv_right);
-
-                            tv_title_left.setLayoutParams(params_tv_title_left);
-                            tv_title_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                            tv_title_middle.setLayoutParams(params_tv_title_middle);
-                            tv_title_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_title_right.setLayoutParams(params_tv_title_middle);
-                            tv_title_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                            tv_unit_left.setLayoutParams(params_tv_unit_left);
-                            tv_unit_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                            tv_unit_middle.setLayoutParams(params_tv_unit_middle);
-                            tv_unit_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                            tv_unit_right.setLayoutParams(params_tv_unit_middle);
-                            tv_unit_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                            iv_circle_left.setLayoutParams(params_iv_circle_left);
-                            iv_circle_left_inner.setLayoutParams(params_iv_circle_left_inner);
-                            iv_circle_left_outer.setLayoutParams(params_iv_circle_left_outer);
-
-                            iv_circle_middle.setLayoutParams(params_iv_circle_middle);
-                            iv_circle_middle_inner.setLayoutParams(params_iv_circle_middle_inner);
-                            iv_circle_middle_outer.setLayoutParams(params_iv_circle_middle_outer);
-
-                            iv_circle_right.setLayoutParams(params_iv_circle_right);
-                            iv_circle_right_inner.setLayoutParams(params_iv_circle_right_inner);
-                            iv_circle_right_outer.setLayoutParams(params_iv_circle_right_outer);
-
-                            rl_left.setLayoutParams(params_rl_left);
-                            rl_middle.setLayoutParams(params_rl_middle);
-                            rl_right.setLayoutParams(params_rl_right);
-
-                            rl_middle.setOnClickListener(null);
-                            rl_left.setOnClickListener(onLeftClick);
-
-                            hideLayout = rl_middle;
-                        }
-
-                        anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_in);
-                        anim_2.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-
-                                rl_left.setVisibility(View.VISIBLE);
-                                rl_right.setVisibility(View.VISIBLE);
-                                rl_middle.setVisibility(View.VISIBLE);
-                                anim_2 = null;
-                                transition = false;
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {
-
-                            }
-                        });
-                        tmpHidenLayout.startAnimation(anim_2);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-
-            });
-        }
-    };*/
 
 
     private boolean flagRight = false;
@@ -702,11 +524,7 @@ public class MainActivity extends BaseActivity {
             if(transition){
                 return;
             }
-/*
-            final RelativeLayout tmpHidenLayout = layeroutArray[2];
-*/
             transition = true;
-            //TODO LIST:清除监听器
             layeroutArray[0].setOnClickListener(null);
             layeroutArray[1].setOnClickListener(null);
             layeroutArray[2].setOnClickListener(null);
@@ -796,171 +614,7 @@ public class MainActivity extends BaseActivity {
             });
         }
     };
-   /* View.OnClickListener onRightClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if(transition){
-                //animation hasn't finished
-                return;
-            }
-            flagLeft = false;
-            rl_left.setOnClickListener(null);
-            rl_middle.setOnClickListener(null);
-            rl_left.setOnClickListener(onLeftClick);
-            transition = true;
-            flagRight = !flagRight;
-            final RelativeLayout tmpHidenLayout = hideLayout;
-            v.setVisibility(View.INVISIBLE);
-            hideLayout.setVisibility(View.INVISIBLE);
 
-            anim_1 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_right_out);
-            Animation anim_tmp = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_trans_right);
-            v.startAnimation(anim_1);
-            hideLayout.startAnimation(anim_tmp);
-
-            anim_1.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    anim_1 = null;
-
-                    if (flagRight) {
-                        tv_index_right.setLayoutParams(params_tv_middle);
-                        tv_index_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
-                        tv_index_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_index_middle.setLayoutParams(params_tv_right);
-                        tv_index_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_index_left.setLayoutParams(params_tv_left);
-
-                        tv_title_right.setLayoutParams(params_tv_title_middle);
-                        tv_title_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_title_middle.setLayoutParams(params_tv_title_right);
-                        tv_title_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                        tv_title_left.setLayoutParams(params_tv_title_left);
-                        tv_title_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-
-                        tv_unit_right.setLayoutParams(params_tv_unit_middle);
-                        tv_unit_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_unit_middle.setLayoutParams(params_tv_unit_right);
-                        tv_unit_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                        tv_unit_left.setLayoutParams(params_tv_unit_left);
-                        tv_unit_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                        iv_circle_right.setLayoutParams(params_iv_circle_middle);
-                        iv_circle_right_inner.setLayoutParams(params_iv_circle_middle_inner);
-                        iv_circle_right_outer.setLayoutParams(params_iv_circle_middle_outer);
-
-
-                        iv_circle_middle.setLayoutParams(params_iv_circle_right);
-                        iv_circle_middle_inner.setLayoutParams(params_iv_circle_right_inner);
-                        iv_circle_middle_outer.setLayoutParams(params_iv_circle_right_outer);
-
-                        iv_circle_left.setLayoutParams(params_iv_circle_left);
-                        iv_circle_left_inner.setLayoutParams(params_iv_circle_left_inner);
-                        iv_circle_left_outer.setLayoutParams(params_iv_circle_left_outer);
-
-                        rl_right.setLayoutParams(params_rl_middle);
-                        rl_middle.setLayoutParams(params_rl_right);
-                        rl_left.setLayoutParams(params_rl_left);
-
-                        rl_right.setOnClickListener(null);
-                        rl_middle.setOnClickListener(onRightClick);
-                        hideLayout = rl_right;
-                    } else {
-                        tv_index_right.setLayoutParams(params_tv_right);
-                        tv_index_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_index_middle.setLayoutParams(params_tv_middle);
-                        tv_index_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 32);
-                        tv_index_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_index_left.setLayoutParams(params_tv_left);
-
-                        tv_title_right.setLayoutParams(params_tv_title_right);
-                        tv_title_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                        tv_title_middle.setLayoutParams(params_tv_title_middle);
-                        tv_title_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_title_left.setLayoutParams(params_tv_title_left);
-                        tv_title_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                        tv_unit_right.setLayoutParams(params_tv_unit_right);
-                        tv_unit_right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-                        tv_unit_middle.setLayoutParams(params_tv_unit_middle);
-                        tv_unit_middle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                        tv_unit_left.setLayoutParams(params_tv_unit_left);
-                        tv_unit_left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-
-                        iv_circle_right.setLayoutParams(params_iv_circle_right);
-                        iv_circle_right_inner.setLayoutParams(params_iv_circle_right_inner);
-                        iv_circle_right_outer.setLayoutParams(params_iv_circle_right_outer);
-
-                        iv_circle_middle.setLayoutParams(params_iv_circle_middle);
-                        iv_circle_middle_inner.setLayoutParams(params_iv_circle_middle_inner);
-                        iv_circle_middle_outer.setLayoutParams(params_iv_circle_middle_outer);
-
-                        iv_circle_left.setLayoutParams(params_iv_circle_left);
-                        iv_circle_left_inner.setLayoutParams(params_iv_circle_left_inner);
-                        iv_circle_left_outer.setLayoutParams(params_iv_circle_left_outer);
-
-
-                        rl_right.setLayoutParams(params_rl_right);
-                        rl_middle.setLayoutParams(params_rl_middle);
-
-                        rl_middle.setOnClickListener(null);
-                        rl_right.setOnClickListener(onRightClick);
-                        rl_left.setLayoutParams(params_rl_left);
-
-                        hideLayout = rl_middle;
-
-                    }
-
-                    anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.anim_middle_in);
-                    anim_2.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            rl_left.setVisibility(View.VISIBLE);
-                            rl_right.setVisibility(View.VISIBLE);
-                            rl_middle.setVisibility(View.VISIBLE);
-                            anim_2 = null;
-                            transition = false;
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    tmpHidenLayout.startAnimation(anim_2);
-
-                  *//*  if (flagRight) {
-                        rl_right.setVisibility(View.VISIBLE);
-                        tmpHidenLayout.startAnimation(anim_2);
-                    } else {
-                        tmpHidenLayout.setVisibility(View.VISIBLE);
-                        rl_right.startAnimation(anim_2);
-                    }*//*
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-
-            });
-        }
-    };*/
-
-    /*
-        @Click
-    */
     public void rl_right() {
         if (transition) {
             //animation hasn't finished
@@ -995,17 +649,6 @@ public class MainActivity extends BaseActivity {
                 str = (String) tv_unit_right.getText();
                 tv_unit_right.setText(tv_unit_middle.getText());
                 tv_unit_middle.setText(str);
-
-                /*
-                int value_right = Integer.valueOf((String) tv_index_right.getText());
-                int value_middle=  Integer.valueOf((String) tv_index_middle.getText());
-                int offset_right = 255 - value_right;
-                int offset_middle = 255 - value_middle;
-                GradientDrawable drawable_right = (GradientDrawable) iv_circle_right.getBackground();
-                drawable_right.setColor(Color.argb(255, offset_right, value_right, 0));
-                GradientDrawable drawable_middle = (GradientDrawable) iv_circle_middle.getBackground();
-                drawable_middle.setColor(Color.argb(255, offset_middle, value_middle, 0));
-*/
 
                 anim_2 = AnimationUtils.loadAnimation(MainActivity.this, R.anim.scale_up_left_top);
                 anim_2.setAnimationListener(new Animation.AnimationListener() {
@@ -1056,6 +699,8 @@ public class MainActivity extends BaseActivity {
 
     @AfterViews
     public void init() {
+
+        requestPermissions(this, neededPermissions,null);
 
         bleManager = new BleManager(this);
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -1147,6 +792,66 @@ public class MainActivity extends BaseActivity {
                 ApiClent.getWeather(MainActivity.this, city, weatherCallback);
             }
         }
+    }
+
+    //高德定位所需要的权限
+    protected final String[] neededPermissions = new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE
+    };
+    private static final int REQUEST_CODE = 2333;
+
+//    private CheckPermissionsListener mListener;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQUEST_CODE:
+                List<String> deniedPermissions = new ArrayList<>();
+                int length = grantResults.length;
+                for (int i = 0; i < length; i++){
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                        //该权限被拒绝了
+                        deniedPermissions.add(permissions[i]);
+                    }
+                }
+              /*  if (deniedPermissions.size() > 0){
+                    mListener.onDenied(deniedPermissions);
+                }else{
+                    mListener.onGranted();
+                }*/
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    public void requestPermissions(Activity activity, String[] permissions, CheckPermissionsListener listener){
+        if (activity == null) return;
+//        mListener = listener;
+        List<String> deniedPermissions = findDeniedPermissions(activity, permissions);
+        if (!deniedPermissions.isEmpty()){
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
+        }else{
+            //所有权限都已经同意了
+//            mListener.onGranted();
+        }
+    }
+
+    private List<String> findDeniedPermissions(Activity activity, String... permissions){
+        List<String> deniedPermissions = new ArrayList<>();
+        for (String permission : permissions){
+            if (ActivityCompat.checkSelfPermission(activity, permission)
+                    != PackageManager.PERMISSION_GRANTED){
+                deniedPermissions.add(permission);
+            }
+        }
+        return deniedPermissions;
     }
 
     private void startUpdateService() {
