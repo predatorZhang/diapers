@@ -742,6 +742,7 @@ public class MainActivity extends BaseActivity {
             mBleSupported = false;
         }
         bleManager.enableBluetooth();
+        //connect to device
         startScan();
 
 //        ib_device.setImageResource(R.drawable.dv_disconneted);
@@ -819,6 +820,7 @@ public class MainActivity extends BaseActivity {
     private Handler debugHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            ib_device.setImageResource(R.drawable.icon_connect);
             showResult(23, 10, 180, 180, 180, 0.46f, 60);
             super.handleMessage(msg);
         }
@@ -1001,6 +1003,9 @@ public class MainActivity extends BaseActivity {
                                 Toast.makeText(MainActivity.this.getApplication(), "未找到甲醛检测仪", Toast.LENGTH_LONG).show();
                             }
                         });
+
+                        //reconnect to device every 15s
+                        connectHandler.sendEmptyMessageDelayed(0, 15000);
                     }
 
                     @Override
@@ -1060,6 +1065,8 @@ public class MainActivity extends BaseActivity {
                     public void onConnectFailure(BleException exception) {
                         Log.i(TAG, "连接失败或连接中断：" + exception.toString());
                         bleManager.handleException(exception);
+                        //reconnect to device every 15s
+                        connectHandler.sendEmptyMessageDelayed(0, 15000);
 
                         MainActivity.this.runOnUiThread(new Runnable() {
                             public void run() {
@@ -1397,7 +1404,7 @@ public class MainActivity extends BaseActivity {
                 builder.show();
 
             }else{
-                showShare("www.baidu.com", SCREENSHOT_PATH + s, getString(R.string.share_message));
+                showShare("www.hainiutech.com", SCREENSHOT_PATH + s, getString(R.string.share_message));
             }
             super.onPostExecute(s);
         }
@@ -1445,5 +1452,15 @@ public class MainActivity extends BaseActivity {
         oks.show(this);
     }
 
+
+    //connection handler
+    private Handler connectHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            Toast.makeText(MainActivity.this, getString(R.string.toast_msg_reconnecting), Toast.LENGTH_SHORT).show();
+            startScan();
+            super.handleMessage(msg);
+        }
+    };
 
 }//end of file

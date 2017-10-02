@@ -18,11 +18,19 @@
     <string name="bt_not_on">蓝牙开启失败</string>
     <string name="title_activity_update_tip">UpdateTipActivity</string>
 
+    <string name="toast_msg_reconnecting">重连中...</string>
 
     <string-array name="device_filter"><item>HN_PM2.5_CH2O</item></string-array>
 <!--
     <string-array name="device_filter"><item>SensorTag</item></string-array>
 -->
+
+    <!--general-->
+    <string name="btn_ok">好的</string>
+
+    <!--messages-->
+    <string name="alert_msg_bluetooth_disabled">蓝牙被禁用，请启用蓝牙功能</string>
+    <string name="alert_msg_location_disabled">定位功能被禁用，会影响蓝牙功能，请启用定位功能</string>
 
     <!-- ShareSDK-->
     <string name="share">分享</string>

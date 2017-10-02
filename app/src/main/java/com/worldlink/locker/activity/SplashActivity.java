@@ -1,6 +1,11 @@
 package com.worldlink.locker.activity;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -44,15 +49,36 @@ public class SplashActivity extends BaseActivity {
 
     private ImageLoadTool imageLoadTool = new ImageLoadTool();
 
+    private boolean exit = false;
 
     Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg) {
-            // TODO Auto-generated method stub
-            if (msg.what == 0) {
-                foreMask.startAnimation(entrance);
-            } else if (msg.what == 1) {
-                next();
+                public void handleMessage(Message msg) {
+                    // TODO Auto-generated method stub
+                    if (msg.what == 0) {
+                        foreMask.startAnimation(entrance);
+                    } else if (msg.what == 1) {
+                        next();
+                    }else{
+                        AlertDialog.Builder builder = new AlertDialog.Builder(SplashActivity.this);
+
+
+                        switch(msg.arg1){
+                            case 1:
+                                builder.setMessage(R.string.alert_msg_bluetooth_disabled);
+                                break;
+                            case 2:
+                                builder.setMessage(R.string.alert_msg_location_disabled);
+                                break;
+                        }
+                builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                        System.exit(0);
+                    }
+                });
+                builder.create().show();
             }
         }
     };
@@ -89,7 +115,10 @@ public class SplashActivity extends BaseActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                mHandler.sendEmptyMessageDelayed(1, 200);
+                if(!exit){
+                    mHandler.sendEmptyMessageDelayed(1, 200);
+                }
+
             }
 
             @Override
@@ -97,7 +126,40 @@ public class SplashActivity extends BaseActivity {
             }
         });
 
-        mHandler.sendEmptyMessageDelayed(0, 200);
+        //check bluetooth state
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(mBluetoothAdapter != null){
+            if(!mBluetoothAdapter.isEnabled()){
+                exit = true;
+                foreMask.startAnimation(entrance);
+                Message msg = mHandler.obtainMessage(-1);
+                msg.arg1 = 1;
+                mHandler.sendMessageDelayed(msg, 1500);
+            }else{
+                //check location state
+                boolean gps_enabled = false;
+                boolean network_enabled = false;
+
+                try{
+                    LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                    network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                if(!gps_enabled && !network_enabled){
+                    exit = true;
+                    foreMask.startAnimation(entrance);
+                    Message msg = mHandler.obtainMessage(-1);
+                    msg.arg1 = 2;
+                    mHandler.sendMessageDelayed(msg, 1500);
+
+                }else{
+                    mHandler.sendEmptyMessageDelayed(0, 200);
+                }
+            }
+        }
+
 
     }
 
