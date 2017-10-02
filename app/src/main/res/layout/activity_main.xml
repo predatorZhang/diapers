@@ -496,14 +496,16 @@
                 />
         </LinearLayout>
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/uidesign_index_label_width"
+            android:layout_height="@dimen/uidesign_index_label_height"
             android:orientation="vertical"
             android:gravity="center|center"
             >
             <TextView
-                android:layout_width="@dimen/uidesign_index_label_width"
-                android:layout_height="@dimen/uidesign_index_label_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/uidesign_index_state_label_textsize"
                 android:text="--"
@@ -553,14 +555,16 @@
                 />
         </LinearLayout>
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/uidesign_index_label_width"
+            android:layout_height="@dimen/uidesign_index_label_height"
             android:orientation="vertical"
             android:gravity="center|center"
             >
             <TextView
-                android:layout_width="@dimen/uidesign_index_label_width"
-                android:layout_height="@dimen/uidesign_index_label_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/uidesign_index_state_label_textsize"
                 android:text="--"
@@ -611,19 +615,22 @@
                 />
         </LinearLayout>
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="24dp"
             android:orientation="vertical"
             android:gravity="center|center"
             >
             <TextView
-                android:layout_width="@dimen/uidesign_index_label_width"
-                android:layout_height="@dimen/uidesign_index_label_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/uidesign_index_state_label_textsize"
                 android:text="--"
                 android:id="@+id/tv_hum_eval"
                 android:background="@drawable/oval"
+
                 android:gravity="center|center"
                 />
 

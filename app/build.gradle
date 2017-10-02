@@ -21,7 +21,7 @@ android {
     signingConfigs {
         //调试版的keystore
         debug {
-            storeFile file("/Users/predator/Documents/JavaTutorial/airBeanDebug.jks")
+            storeFile file("D:\\StevensT\\Sources\\OurStartup\\HainiuTech\\airBeanDebug.jks")
             storePassword "hainiu"
             keyAlias "airBeanDebug"
             keyPassword "hainiu"

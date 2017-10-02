@@ -211,6 +211,7 @@ public class MainActivity extends BaseActivity {
 
 
     //added by StevenT
+    private boolean DEMO = true;
     private boolean shouldNotifyUser = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
@@ -743,10 +744,13 @@ public class MainActivity extends BaseActivity {
         }
         bleManager.enableBluetooth();
         //connect to device
-        startScan();
+        if(DEMO){
+            startScan();
+        }
+
 
 //        ib_device.setImageResource(R.drawable.dv_disconneted);
-        ib_device.setImageResource(R.drawable.icon_disconnect);
+        ib_device.setImageResource(R.drawable.icon_bluetooth_red);
         XGPushManager.registerPush(this, "*");
 
         updateNotifyService();
@@ -768,7 +772,7 @@ public class MainActivity extends BaseActivity {
         this.tv_cell.setText("--%");
 
 
-        iv_background.setImageResource(bg_ids[2]);
+        iv_background.setImageResource(R.drawable.bg_image1080p);
         final BubbleLayout bubbleLayout = (BubbleLayout) LayoutInflater.from(this).
                 inflate(R.layout.layout_weather_bubble, null);
         weatherPopupWindow = BubblePopupHelper.create(this, bubbleLayout);
@@ -783,6 +787,7 @@ public class MainActivity extends BaseActivity {
         ib_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 View mView = getWindow().getDecorView().getRootView();
                 mView.setDrawingCacheEnabled(true);
                 Bitmap bmp = Bitmap.createBitmap(mView.getDrawingCache());
@@ -810,8 +815,11 @@ public class MainActivity extends BaseActivity {
         hideLayout = this.rl_middle;
         this.initLayoutParam();
 
-        //for testing
-//        debugHandler.sendEmptyMessageDelayed(0, 5000);
+
+        if(DEMO){
+            debugHandler.sendEmptyMessageDelayed(0, 2000);
+        }
+
 
     }
 
@@ -820,7 +828,8 @@ public class MainActivity extends BaseActivity {
     private Handler debugHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            ib_device.setImageResource(R.drawable.icon_connect);
+            ib_device.setImageResource(R.drawable.icon_bluetooth);
+//            ib_device.setImageResource(R.drawable.icon_connect);
             showResult(23, 10, 180, 180, 180, 0.46f, 60);
             super.handleMessage(msg);
         }
@@ -986,7 +995,8 @@ public class MainActivity extends BaseActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                ib_device.setImageResource(R.drawable.icon_disconnect);
+                                ib_device.setImageResource(R.drawable.icon_bluetooth_red);
+//                                ib_device.setImageResource(R.drawable.icon_disconnect);
                                 //restore widgets state
                                 iv_circle_middle.setBackgroundResource(R.drawable.circle5);
                                 GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
@@ -1021,7 +1031,8 @@ public class MainActivity extends BaseActivity {
                             public void run() {
                                 gatt.discoverServices();
                                 Toast.makeText(MainActivity.this.getApplication(), "设备连接已连接", Toast.LENGTH_LONG).show();
-                                ib_device.setImageResource(R.drawable.icon_connect);
+                                ib_device.setImageResource(R.drawable.icon_bluetooth);
+//                                ib_device.setImageResource(R.drawable.icon_connect);
 
                             }
                         });
@@ -1072,7 +1083,8 @@ public class MainActivity extends BaseActivity {
                             public void run() {
                                 try {
                                     Toast.makeText(getApplication(), "设备连接已断开，请重连", Toast.LENGTH_LONG).show();
-                                    ib_device.setImageResource(R.drawable.icon_disconnect);
+                                    ib_device.setImageResource(R.drawable.icon_bluetooth_red);
+//                                    ib_device.setImageResource(R.drawable.icon_disconnect);
                                     //restore widgets state
                                     iv_circle_middle.setBackgroundResource(R.drawable.circle5);
                                     GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
@@ -1190,7 +1202,7 @@ public class MainActivity extends BaseActivity {
     private void showResult(float temp, float humi, float pm1,
                             float pm, float pm10, float hcho, float cell) {
 
-        this.changeBackgroundImage(hcho, pm);
+//        this.changeBackgroundImage(hcho, pm);
 
         this.tv_cell.setText((int) cell + "%");
         if (cell > 75) {
@@ -1356,7 +1368,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private static final String SCREENSHOT_PATH = "/sdcard/Hainiu/";
+    private static final String SCREENSHOT_PATH = "/sdcard/";
     private class ScreenshotTask extends AsyncTask<Bitmap, Void, String> {
 
         @Override
@@ -1412,6 +1424,7 @@ public class MainActivity extends BaseActivity {
 
     private void showShare(String url, String image_path, String msg) {
         OnekeyShare oks = new OnekeyShare();
+
         oks.setCallback(new PlatformActionListener() {
             @Override
             public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
@@ -1440,8 +1453,9 @@ public class MainActivity extends BaseActivity {
         oks.setText(getString(R.string.share_message));
         // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
         oks.setImagePath(image_path);//确保SDcard下面存在此张图片
+//        oks.setViewToShare(getWindow().getDecorView().getRootView());
         // url仅在微信（包括好友和朋友圈）中使用
-        oks.setUrl(url);
+//        oks.setUrl(url);
         // comment是我对这条分享的评论，仅在人人网和QQ空间使用
         oks.setComment(msg);
         // site是分享此内容的网站名称，仅在QQ空间使用
