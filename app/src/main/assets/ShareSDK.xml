@@ -101,7 +101,7 @@
         AppSecret="9ee83c74b11d1085f10bcc2e724720f6"
 		userName="gh_afb25ac019c9"
 		path="pages/index/index.html?id=1"
-        BypassApproval="true"
+        BypassApproval="false"
         Enable="true" />
 
     <WechatMoments
