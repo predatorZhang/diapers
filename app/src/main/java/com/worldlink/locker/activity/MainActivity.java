@@ -207,7 +207,7 @@ public class MainActivity extends BaseActivity {
 
 
     //added by StevenT
-    private boolean DEMO = false;
+    private boolean DEMO = true;
     private boolean shouldNotifyUser = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
