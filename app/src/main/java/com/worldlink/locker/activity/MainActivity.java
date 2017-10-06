@@ -75,6 +75,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -207,7 +208,7 @@ public class MainActivity extends BaseActivity {
 
 
     //added by StevenT
-    private boolean DEMO = true;
+    private boolean DEMO = false;
     private boolean shouldNotifyUser = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
@@ -740,7 +741,7 @@ public class MainActivity extends BaseActivity {
         }
         bleManager.enableBluetooth();
         //connect to device
-        if(DEMO){
+        if(!DEMO){
             startScan();
         }
 
@@ -1015,8 +1016,8 @@ public class MainActivity extends BaseActivity {
                             }
                         });
 
-                        //reconnect to device every 15s
-                        connectHandler.sendEmptyMessageDelayed(0, 15000);
+                        //reconnect to device every 60s
+                        connectHandler.sendEmptyMessageDelayed(0, 60000);
                     }
 
                     @Override
@@ -1252,7 +1253,10 @@ public class MainActivity extends BaseActivity {
             drawable.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_middle.setText("重度污染");
         }
-        this.tv_index_middle.setText(hcho + "");
+        //test
+        DecimalFormat dFormat = new DecimalFormat("0.000");
+        this.tv_index_middle.setText(dFormat.format(hcho));
+//        this.tv_index_middle.setText(hcho + "");
 
         /*
         pm10
