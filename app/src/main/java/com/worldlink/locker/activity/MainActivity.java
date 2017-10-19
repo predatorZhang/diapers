@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.AsyncTask;
@@ -22,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -1370,14 +1372,24 @@ public class MainActivity extends BaseActivity {
         protected String doInBackground(Bitmap... params) {
 
             Bitmap bmp = params[0];
-            String root_path = SCREENSHOT_PATH;
+            String root_path = MainActivity.this.getFilesDir().getPath() + File.separator;//SCREENSHOT_PATH;
 
+
+            root_path += "images" + File.separator;
             File testPath = new File(root_path);
             if(!testPath.exists()){
                 testPath.mkdir();
             }
             String filename = MainActivity.this.getString(R.string.share_file_name) + ".jpg";
-            File target = new File(SCREENSHOT_PATH + filename);
+            File target = new File(root_path + filename);
+            if(!target.exists()){
+                try {
+                    target.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+//            File target = new File(SCREENSHOT_PATH + filename);
             try {
                 FileOutputStream fos = new FileOutputStream(target);
                 bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -1411,7 +1423,16 @@ public class MainActivity extends BaseActivity {
                 builder.show();
 
             }else{
-                showShare("www.hainiutech.com", SCREENSHOT_PATH + s, getString(R.string.share_message));
+//                showShare("www.hainiutech.com", SCREENSHOT_PATH + s, getString(R.string.share_message));
+                //share screenshot
+                File imagePath = new File(MainActivity.this.getFilesDir(), "images");
+                File newFile = new File(imagePath, s);
+                Uri contentUri = FileProvider.getUriForFile(MainActivity.this, "com.worldlink.locker.fileprovider", newFile);
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                shareIntent.setType("image/jpeg");
+                startActivity(Intent.createChooser(shareIntent, "Share to ..."));
             }
             super.onPostExecute(s);
         }
