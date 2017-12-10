@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.AsyncTask;
@@ -65,6 +66,7 @@ import com.worldlink.locker.http.ApiClent;
 import com.zaaach.citypicker.CheckPermissionsListener;
 import com.zaaach.citypicker.CityPickerActivity;
 import com.zaaach.citypicker.utils.StringUtils;
+
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -727,6 +729,12 @@ public class MainActivity extends BaseActivity {
 
     public boolean mBleSupported = false;
 
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
     @AfterViews
     public void init() {
 

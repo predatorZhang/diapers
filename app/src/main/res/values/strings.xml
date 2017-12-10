@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AirBean</string>
+    <string name="app_name">海牛空气盒子</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">扫描</string>

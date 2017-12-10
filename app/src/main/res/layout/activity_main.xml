@@ -48,7 +48,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="20dp"
         android:layout_marginRight="20dp"
-        android:onClick="onAnimationStyle"
         android:src="@drawable/icon_settings"
         android:background="@color/transparent"
         android:visibility="invisible"/>
@@ -297,7 +296,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
-                android:text="mg/m3"
+                android:text="ug/m3"
                 android:textSize="@dimen/uidesign_index_secondary_unit_size"
 
 

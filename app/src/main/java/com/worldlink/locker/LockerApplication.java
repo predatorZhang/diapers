@@ -11,7 +11,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
 /**
- * Created by admin on 2015/5/3.
+ * Created by Y Tian on 2015/5/3.
  */
 public class LockerApplication extends com.mob.MobApplication
 {

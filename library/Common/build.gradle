@@ -15,5 +15,8 @@ dependencies {
 
 android {
     compileSdkVersion 18
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
+}
+repositories {
+    google()
 }
