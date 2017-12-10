@@ -110,22 +110,22 @@
         >
         <ImageView
             android:id="@+id/iv_circle_middle_outer"
-            android:layout_width="165dp"
-            android:layout_height="165dp"
+            android:layout_width="@dimen/uidesign_index_primary_circle1_width"
+            android:layout_height="@dimen/uidesign_index_primary_circle1_height"
             android:layout_centerInParent="true"
             android:src="@drawable/circle6"
             />
         <ImageView
             android:id="@+id/iv_circle_middle"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
+            android:layout_width="@dimen/uidesign_index_primary_circle2_width"
+            android:layout_height="@dimen/uidesign_index_primary_circle2_height"
             android:layout_centerInParent="true"
              />
 
         <ImageView
             android:id="@+id/iv_circle_middle_inner"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
+            android:layout_width="@dimen/uidesign_index_primary_circle3_width"
+            android:layout_height="@dimen/uidesign_index_primary_circle3_height"
             android:layout_centerInParent="true"
             android:src="@drawable/circle4"
             />

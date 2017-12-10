@@ -5,8 +5,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -126,6 +129,7 @@ public class SplashActivity extends BaseActivity {
             }
         });
 
+
         //check bluetooth state
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter != null){
@@ -135,8 +139,8 @@ public class SplashActivity extends BaseActivity {
                 Message msg = mHandler.obtainMessage(-1);
                 msg.arg1 = 1;
                 mHandler.sendMessageDelayed(msg, 1500);
-            }else{
-                //check location state
+            }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                //check location state on devices with Marshmallow and later
                 boolean gps_enabled = false;
                 boolean network_enabled = false;
 
@@ -157,6 +161,8 @@ public class SplashActivity extends BaseActivity {
                 }else{
                     mHandler.sendEmptyMessageDelayed(0, 200);
                 }
+            }else{
+                mHandler.sendEmptyMessageDelayed(0, 200);
             }
         }
 

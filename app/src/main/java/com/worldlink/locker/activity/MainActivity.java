@@ -95,6 +95,8 @@ public class MainActivity extends BaseActivity {
     private static final String LOG_TAG = "MainActivity";
     private static final int ID_HCHO = 1001;
     private static final int ID_PM25 = 1002;
+    //alpha value
+    private static final int ALPHA = 180;
     //added by Stevens
 //    private SinkView sv_progress;
     private int[] bg_ids = {
@@ -837,7 +839,7 @@ public class MainActivity extends BaseActivity {
         public void handleMessage(Message msg) {
 //            ib_device.setImageResource(R.drawable.icon_bluetooth);
             ib_device.setImageResource(R.drawable.icon_connect);
-            showResult(23, 10, 180, 180, 180, 0.46f, 60);
+            showResult(23, 10, 180, 252, 130, 0.55f, 60);
             super.handleMessage(msg);
         }
     };
@@ -991,11 +993,11 @@ public class MainActivity extends BaseActivity {
 
     private void startScan() {
 
-        if (!bleManager.isBlueEnable()) {
+        if (bleManager != null && !bleManager.isBlueEnable()) {
             bleManager.enableBluetooth();
         }
 
-        if (!bleManager.isConnectingOrConnected()) {
+        if (bleManager != null && !bleManager.isConnectingOrConnected()) {
         bleManager.scanNameAndConnect(
                 DEVICE_NAME,
                 10000,
@@ -1027,7 +1029,7 @@ public class MainActivity extends BaseActivity {
                         });
 
                         //reconnect to device every 60s
-                        connectHandler.sendEmptyMessageDelayed(0, 60000);
+                        connectHandler.sendEmptyMessageDelayed(0, 90000);
                     }
 
                     @Override
@@ -1126,7 +1128,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onDestroy() {
         Log.d(TAG, "Destroy");
-        if (bleManager.isConnectingOrConnected()) {
+        if (bleManager != null && bleManager.isConnectingOrConnected()) {
             bleManager.stopNotify(UUID_SERVICE, UUID_NOTIFY);
             bleManager.closeBluetoothGatt();
             bleManager = null;
@@ -1223,7 +1225,7 @@ public class MainActivity extends BaseActivity {
         //甲醛：<0.1 [0.1,0.5),[0.5,0.6),[0.6.. 正常，轻度污染，污染，重度污染
         GradientDrawable drawable = (GradientDrawable) iv_circle_middle.getBackground();
         if (hcho < 0.1) {
-            drawable.setColor(Color.argb(255, 0, 255, 0));
+            drawable.setColor(Color.argb(ALPHA, 0, 255, 0));
             this.tv_unit_middle.setText("正常");
             if(!shouldNotifyUser){
                 shouldNotifyUser = true;
@@ -1235,7 +1237,7 @@ public class MainActivity extends BaseActivity {
 //            drawable.setColor(Color.argb(255, 50, 0, 0));
             float red = (float) (127.0 * (hcho/0.5));
             float green = 255 - red;
-            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
+            drawable.setColor(Color.argb(ALPHA, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("轻度污染");
             if(shouldNotifyUser){
                 //user has been notified
@@ -1257,10 +1259,10 @@ public class MainActivity extends BaseActivity {
 //            drawable.setColor(Color.argb(255, 100, 0, 0));
             float red = (float) (175.0 * (hcho/0.6));
             float green = 255 - red;
-            drawable.setColor(Color.argb(255, (int)red, (int)green, 0));
+            drawable.setColor(Color.argb(ALPHA, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("污染");
         } else {
-            drawable.setColor(Color.argb(255, 255, 0, 0));
+            drawable.setColor(Color.argb(ALPHA, 255, 0, 0));
             this.tv_unit_middle.setText("重度污染");
         }
         //test
@@ -1276,9 +1278,9 @@ public class MainActivity extends BaseActivity {
         if (pm10 < 150) {
             float red = (float) (255 * (pm10/150.0));
             float green = 255 - red;
-            drawable1.setColor(Color.argb(255, (int)red, (int)green, 0));
+            drawable1.setColor(Color.argb(ALPHA, (int)red, (int)green, 0));
         } else {
-            drawable1.setColor(Color.argb(255, 255, 0, 0));
+            drawable1.setColor(Color.argb(ALPHA, 255, 0, 0));
         }
 
          /*
@@ -1289,9 +1291,9 @@ public class MainActivity extends BaseActivity {
         if(pm < 250){
             float red = 255 * (pm / 250);
             float green = 255 -  red;
-            drawable0.setColor(Color.argb(255, (int)red, (int)green, 0));
+            drawable0.setColor(Color.argb(ALPHA, (int)red, (int)green, 0));
         }else{
-            drawable0.setColor(Color.argb(255, 255, 0, 0));
+            drawable0.setColor(Color.argb(ALPHA, 255, 0, 0));
         }
         if (pm < 35) {
 //            drawable0.setColor(Color.argb(255, 0, 255, 0));
@@ -1495,7 +1497,7 @@ public class MainActivity extends BaseActivity {
     private Handler connectHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            Toast.makeText(MainActivity.this, getString(R.string.toast_msg_reconnecting), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MainActivity.this, getString(R.string.toast_msg_reconnecting), Toast.LENGTH_SHORT).show();
             startScan();
             super.handleMessage(msg);
         }

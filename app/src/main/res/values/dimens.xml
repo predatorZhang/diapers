@@ -10,20 +10,27 @@
     <dimen name="uidesign_index_label_textsize">12sp</dimen>
     <dimen name="uidesign_index_state_label_textsize">14sp</dimen>
     <dimen name="uidesign_index_value_label_textsize">20sp</dimen>
+    <!--primary-->
+    <dimen name="uidesign_index_primary_circle1_width">165dp</dimen>
+    <dimen name="uidesign_index_primary_circle1_height">165dp</dimen>
+    <dimen name="uidesign_index_primary_circle2_width">160dp</dimen>
+    <dimen name="uidesign_index_primary_circle2_height">160dp</dimen>
+    <dimen name="uidesign_index_primary_circle3_width">140dp</dimen>
+    <dimen name="uidesign_index_primary_circle3_height">140dp</dimen>
     <!--secondary-->
     <dimen name="uidesign_index_secondary_circle1_width">95dp</dimen>
     <dimen name="uidesign_index_secondary_circle1_height">95dp</dimen>
     <dimen name="uidesign_index_secondary_circle2_width">90dp</dimen>
     <dimen name="uidesign_index_secondary_circle2_height">90dp</dimen>
-    <dimen name="uidesign_index_secondary_circle3_width">70dp</dimen>
-    <dimen name="uidesign_index_secondary_circle3_height">70dp</dimen>
+    <dimen name="uidesign_index_secondary_circle3_width">75dp</dimen>
+    <dimen name="uidesign_index_secondary_circle3_height">75dp</dimen>
     <!--tertiary-->
     <dimen name="uidesign_index_tertiary_circle1_width">95dp</dimen>
     <dimen name="uidesign_index_tertiary_circle1_height">95dp</dimen>
     <dimen name="uidesign_index_tertiary_circle2_width">90dp</dimen>
     <dimen name="uidesign_index_tertiary_circle2_height">90dp</dimen>
-    <dimen name="uidesign_index_tertiary_circle3_width">70dp</dimen>
-    <dimen name="uidesign_index_tertiary_circle3_height">70dp</dimen>
+    <dimen name="uidesign_index_tertiary_circle3_width">75dp</dimen>
+    <dimen name="uidesign_index_tertiary_circle3_height">75dp</dimen>
 
     <!--text sizes of bigger index-->
 
@@ -31,4 +38,6 @@
     <dimen name="uidesign_index_secondary_title_size">8sp</dimen>
     <dimen name="uidesign_index_secondary_value_size">16sp</dimen>
     <dimen name="uidesign_index_secondary_unit_size">8sp</dimen>
+
+
 </resources>
