@@ -216,6 +216,7 @@ public class MainActivity extends BaseActivity {
     //added by StevenT
     private boolean DEMO = false;
     private boolean shouldNotifyUser = true;
+    private boolean shouldNotifyUser_pm25 = true;
     private ApiClent.ClientCallback weatherCallback = new ApiClent.ClientCallback() {
         @Override
         public void onSuccess(Object data) {
@@ -827,6 +828,8 @@ public class MainActivity extends BaseActivity {
 
         if(DEMO){
             debugHandler.sendEmptyMessageDelayed(0, 2000);
+            debugHandler.sendEmptyMessageDelayed(1, 12000);
+            debugHandler.sendEmptyMessageDelayed(2, 32000);
         }
 
 
@@ -839,7 +842,19 @@ public class MainActivity extends BaseActivity {
         public void handleMessage(Message msg) {
 //            ib_device.setImageResource(R.drawable.icon_bluetooth);
             ib_device.setImageResource(R.drawable.icon_connect);
-            showResult(23, 10, 180, 252, 130, 0.55f, 60);
+            switch(msg.what){
+                case 0:
+                    showResult(23, 10, 180, 252, 130, 0.55f, 60);
+                    break;
+                case 1:
+                    showResult(23, 10, 180, 150, 130, 1.55f, 60);
+                    break;
+
+                case 2:
+                    showResult(23, 10, 180, 100, 130, 0.85f, 60);
+                    break;
+            }
+
             super.handleMessage(msg);
         }
     };
@@ -1261,9 +1276,39 @@ public class MainActivity extends BaseActivity {
             float green = 255 - red;
             drawable.setColor(Color.argb(ALPHA, (int)red, (int)green, 0));
             this.tv_unit_middle.setText("污染");
+            if(shouldNotifyUser){
+                //user has been notified
+                shouldNotifyUser = false;
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setSmallIcon(R.drawable.logo_hainiu_32);
+                builder.setContentTitle(getString(R.string.notification_title));
+                builder.setContentText(getString(R.string.notification_text));
+                builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+                Intent i = new Intent(this, MainActivity_.class);
+                PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                builder.setContentIntent(pi);
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(ID_HCHO, builder.build());
+            }
         } else {
             drawable.setColor(Color.argb(ALPHA, 255, 0, 0));
             this.tv_unit_middle.setText("重度污染");
+            if(shouldNotifyUser){
+                //user has been notified
+                shouldNotifyUser = false;
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setSmallIcon(R.drawable.logo_hainiu_32);
+                builder.setContentTitle(getString(R.string.notification_title));
+                builder.setContentText(getString(R.string.notification_text));
+                builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+                Intent i = new Intent(this, MainActivity_.class);
+                PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                builder.setContentIntent(pi);
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(ID_HCHO, builder.build());
+            }
         }
         //test
         DecimalFormat dFormat = new DecimalFormat("0.000");
@@ -1298,29 +1343,62 @@ public class MainActivity extends BaseActivity {
         if (pm < 35) {
 //            drawable0.setColor(Color.argb(255, 0, 255, 0));
             this.tv_unit_right.setText("优");
+            if(!shouldNotifyUser_pm25){
+                //pm2.5 index has reduced to normal level, dismiss notification
+                shouldNotifyUser_pm25 = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(ID_PM25);
+            }
         } else if (pm >= 35 && pm < 75) {
 //            drawable0.setColor(Color.argb(255, 0, 0, 255));
+            if(!shouldNotifyUser_pm25){
+                //pm2.5 index has reduced to normal level, dismiss notification
+                shouldNotifyUser_pm25 = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(ID_PM25);
+            }
             this.tv_unit_right.setText("良");
         } else if (pm >= 75 && pm < 115) {
 //            drawable0.setColor(Color.argb(255, 50, 0, 0));
+            if(!shouldNotifyUser_pm25){
+                //pm2.5 index has reduced to normal level, dismiss notification
+                shouldNotifyUser_pm25 = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(ID_PM25);
+            }
             this.tv_unit_right.setText("轻度污染");
         } else if (pm >= 115 && pm < 150) {
 //            drawable0.setColor(Color.argb(255, 100, 0, 0));
+            if(!shouldNotifyUser_pm25){
+                //pm2.5 index has reduced to normal level, dismiss notification
+                shouldNotifyUser_pm25 = true;
+                //dismiss notification
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(ID_PM25);
+            }
             this.tv_unit_right.setText("中度污染");
         } else if (pm >= 150 && pm < 250) {
 //            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("重度污染");
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
-            builder.setSmallIcon(R.drawable.logo_hainiu_32);
-            builder.setContentTitle(getString(R.string.notification_title));
-            builder.setContentText(getString(R.string.notification_text_pm25));
-            builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
-            Intent i = new Intent(this, MainActivity_.class);
-            PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-            builder.setContentIntent(pi);
+            if(shouldNotifyUser_pm25){
+                //notify only once
+                shouldNotifyUser_pm25 = false;
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setSmallIcon(R.drawable.logo_hainiu_32);
+                builder.setContentTitle(getString(R.string.notification_title));
+                builder.setContentText(getString(R.string.notification_text_pm25));
+                builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+                Intent i = new Intent(this, MainActivity_.class);
+                PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                builder.setContentIntent(pi);
 
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(ID_PM25, builder.build());
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(ID_PM25, builder.build());
+            }
+
         } else {
 //            drawable0.setColor(Color.argb(255, 255, 0, 0));
             this.tv_unit_right.setText("严重污染");
