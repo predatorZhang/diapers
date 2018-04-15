@@ -274,7 +274,7 @@ public class MainActivity extends BaseActivity {
         TextView tvWetrTime = (TextView) this.findViewById(R.id.wetrtv_time);
 
         tvWetrCity.setText(city);
-        imageLoadTool.loadImage(this.ib_weather, "http://files.heweather.com/cond_icon/"
+        imageLoadTool.loadImage(this.ib_weather, "http://cdn.heweather.com/cond_icon/"
                 + code + ".png", (DisplayImageOptions) null);
         tvWetrHumi.setText("湿度:" + humi + "%");
         tvWetrTemp.setText("温度:" + temp + "°C");
